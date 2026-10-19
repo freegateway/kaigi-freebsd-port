@@ -1,0 +1,8 @@
+Kaigi is the FreeGateway Project's privacy-hardened fork of MiroTalk SFU.
+It provides self-hosted WebRTC conferencing with local browser assets,
+per-user meeting grants, local or LDAP authentication, and no participant
+presenter authority. The native mediasoup API and worker are supplied by
+the www/mediasoup port.
+
+Kaigi uses its own service, configuration, runtime and log directories so
+that the independently maintained MiroTalk port can coexist.

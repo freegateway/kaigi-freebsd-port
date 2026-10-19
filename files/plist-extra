@@ -1,0 +1,21 @@
+etc/rc.d/kaigi
+@sample etc/kaigi/kaigi.conf.sample
+@sample etc/kaigi/site-translations.json.sample
+@sample etc/kaigi/meeting-properties.json.sample
+@sample etc/kaigi/site-assets/site.css.sample
+etc/kaigi/site-assets/privacy-private.html.sample
+etc/kaigi/site-assets/privacy-public.html.sample
+@sample(root,wheel,0600) etc/kaigi/users.sample
+@sample etc/kaigi/ldap/ldap.conf.sample
+@sample etc/kaigi/ldap/group-meetings.json.sample
+@dir etc/kaigi/site-assets
+share/man/man8/kaigi.8.gz
+share/man/man5/kaigi.conf.5.gz
+share/man/man5/kaigi-ldap.conf.5.gz
+%%DOCSDIR%%/README.md
+%%DOCSDIR%%/HARDENING.md
+%%DOCSDIR%%/BASELINE.md
+%%DOCSDIR%%/UPSTREAM.md
+%%DOCSDIR%%/vendor-files.json
+%%EXAMPLESDIR%%/fail2ban/kaigi.conf
+etc/newsyslog.conf.d/kaigi.conf
