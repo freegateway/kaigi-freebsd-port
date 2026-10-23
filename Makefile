@@ -18,7 +18,7 @@ RUN_DEPENDS=	mediasoup>=3.31.0:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	16d84c38019b579685a7edd777527c89459e4c52
+GH_TAGNAME=	b9ba6c01225fb5fbcbe5e4840caeedff73c3ec0d
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
