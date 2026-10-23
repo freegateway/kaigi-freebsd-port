@@ -14,7 +14,7 @@ application-specific fail2ban filter belong to the Kaigi repository.
 
 Copy this port into `www/kaigi` in your ports tree or Poudriere overlay, then
 build and test `www/kaigi` using your usual Poudriere configuration. The port
-requires `www/mediasoup` version 3.30.1 or newer and Node.js 24.
+requires `www/mediasoup` version 3.31.0 or newer and Node.js 24.
 
 The service is `kaigi`; settings live in `/usr/local/etc/kaigi/kaigi.conf`.
 Configure users, meeting permissions, TLS and media addresses before starting

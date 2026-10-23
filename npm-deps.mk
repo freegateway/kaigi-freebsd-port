@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit 33e86ed7eed11e7192d6d67440cc93964c240f23.
+# Locked production dependencies from Kaigi commit 16d84c38019b579685a7edd777527c89459e4c52.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -183,7 +183,7 @@ DISTFILES+=	finalhandler-2.1.0.tgz:npm088
 MASTER_SITES+=	https://registry.npmjs.org/flatbuffers/-/:npm089
 DISTFILES+=	flatbuffers-25.9.23.tgz:npm089
 MASTER_SITES+=	https://registry.npmjs.org/follow-redirects/-/:npm090
-DISTFILES+=	follow-redirects-1.16.0.tgz:npm090
+DISTFILES+=	follow-redirects-1.16.1.tgz:npm090
 MASTER_SITES+=	https://registry.npmjs.org/for-each/-/:npm091
 DISTFILES+=	for-each-0.3.5.tgz:npm091
 MASTER_SITES+=	https://registry.npmjs.org/form-data/-/:npm092
@@ -255,7 +255,7 @@ DISTFILES+=	inherits-2.0.4.tgz:npm124
 MASTER_SITES+=	https://registry.npmjs.org/internal-slot/-/:npm125
 DISTFILES+=	internal-slot-1.1.0.tgz:npm125
 MASTER_SITES+=	https://registry.npmjs.org/ip-address/-/:npm126
-DISTFILES+=	ip-address-10.7.2.tgz:npm126
+DISTFILES+=	ip-address-10.7.4.tgz:npm126
 MASTER_SITES+=	https://registry.npmjs.org/ipaddr.js/-/:npm127
 DISTFILES+=	ipaddr.js-1.9.1.tgz:npm127
 MASTER_SITES+=	https://registry.npmjs.org/is-array-buffer/-/:npm128
@@ -345,7 +345,7 @@ DISTFILES+=	mdn-data-2.27.1.tgz:npm169
 MASTER_SITES+=	https://registry.npmjs.org/media-typer/-/:npm170
 DISTFILES+=	media-typer-1.1.0.tgz:npm170
 MASTER_SITES+=	https://registry.npmjs.org/mediasoup-client/-/:npm171
-DISTFILES+=	mediasoup-client-3.24.5.tgz:npm171
+DISTFILES+=	mediasoup-client-3.25.3.tgz:npm171
 MASTER_SITES+=	https://registry.npmjs.org/merge-descriptors/-/:npm172
 DISTFILES+=	merge-descriptors-2.0.0.tgz:npm172
 MASTER_SITES+=	https://registry.npmjs.org/mime-db/-/:npm173
@@ -379,7 +379,7 @@ DISTFILES+=	node-domexception-1.0.0.tgz:npm186
 MASTER_SITES+=	https://registry.npmjs.org/node-fetch/-/:npm187
 DISTFILES+=	node-fetch-3.3.2.tgz:npm187
 MASTER_SITES+=	https://registry.npmjs.org/nodemailer/-/:npm188
-DISTFILES+=	nodemailer-10.1.3.tgz:npm188
+DISTFILES+=	nodemailer-10.2.1.tgz:npm188
 MASTER_SITES+=	https://registry.npmjs.org/oauth4webapi/-/:npm189
 DISTFILES+=	oauth4webapi-3.8.6.tgz:npm189
 MASTER_SITES+=	https://registry.npmjs.org/object-assign/-/:npm190
@@ -695,7 +695,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/fetch-blob fetch-blob-3.2.0.tgz \
 		node_modules/finalhandler finalhandler-2.1.0.tgz \
 		node_modules/flatbuffers flatbuffers-25.9.23.tgz \
-		node_modules/follow-redirects follow-redirects-1.16.0.tgz \
+		node_modules/follow-redirects follow-redirects-1.16.1.tgz \
 		node_modules/for-each for-each-0.3.5.tgz \
 		node_modules/form-data form-data-4.0.6.tgz \
 		node_modules/form-data/node_modules/mime-db mime-db-1.52.0.tgz \
@@ -729,7 +729,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/iconv-lite iconv-lite-0.7.3.tgz \
 		node_modules/inherits inherits-2.0.4.tgz \
 		node_modules/internal-slot internal-slot-1.1.0.tgz \
-		node_modules/ip-address ip-address-10.7.2.tgz \
+		node_modules/ip-address ip-address-10.7.4.tgz \
 		node_modules/ipaddr.js ipaddr.js-1.9.1.tgz \
 		node_modules/is-array-buffer is-array-buffer-3.0.5.tgz \
 		node_modules/is-async-function is-async-function-2.1.1.tgz \
@@ -776,7 +776,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/math-intrinsics math-intrinsics-1.1.0.tgz \
 		node_modules/mdn-data mdn-data-2.27.1.tgz \
 		node_modules/media-typer media-typer-1.1.0.tgz \
-		node_modules/mediasoup-client mediasoup-client-3.24.5.tgz \
+		node_modules/mediasoup-client mediasoup-client-3.25.3.tgz \
 		node_modules/mime-db mime-db-1.54.0.tgz \
 		node_modules/mime-types mime-types-3.0.2.tgz \
 		node_modules/minipass minipass-7.1.3.tgz \
@@ -785,7 +785,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/negotiator negotiator-0.6.4.tgz \
 		node_modules/node-domexception node-domexception-1.0.0.tgz \
 		node_modules/node-fetch node-fetch-3.3.2.tgz \
-		node_modules/nodemailer nodemailer-10.1.3.tgz \
+		node_modules/nodemailer nodemailer-10.2.1.tgz \
 		node_modules/oauth4webapi oauth4webapi-3.8.6.tgz \
 		node_modules/object-assign object-assign-4.1.1.tgz \
 		node_modules/object-inspect object-inspect-1.13.4.tgz \
