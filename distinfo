@@ -1,4 +1,4 @@
-TIMESTAMP = 1793080997
+TIMESTAMP = 1793086487
 SHA256 (kaigi/accepts-1.3.8.tgz) = bf189aca3f8278229fc71526b8d5d2bae42e9eb2dae4992f2d3a944d32d06d75
 SIZE (kaigi/accepts-1.3.8.tgz) = 5403
 SHA256 (kaigi/accepts-2.0.0.tgz) = 173d915f7d88df8cd4db2129a030c3b1c9cafd3b7aee5b89465bf3ad18372542
@@ -191,8 +191,8 @@ SHA256 (kaigi/formula-3.0.1.tgz) = e1499a9ba6e64a6e821032e7aa40abc85de0a3b378368
 SIZE (kaigi/formula-3.0.1.tgz) = 4739
 SHA256 (kaigi/forwarded-0.2.0.tgz) = 9b5a5de95fb85fcb58db5e4fcd94ce8ab9f0476d02202e20a5225cec60431c99
 SIZE (kaigi/forwarded-0.2.0.tgz) = 2696
-SHA256 (kaigi/freegateway-kaigi-0.1.0-fe86820e0b4017260727a826e8f6d1dcf7caebc9_GH0.tar.gz) = 2e99feb4c8d3853c492d2165909994f65c8486f499127a523b2a4998cea12e0c
-SIZE (kaigi/freegateway-kaigi-0.1.0-fe86820e0b4017260727a826e8f6d1dcf7caebc9_GH0.tar.gz) = 68509293
+SHA256 (kaigi/freegateway-kaigi-0.2.0-19821989daa21e678f037bd86c53a491bd5c9749_GH0.tar.gz) = 7cab20dca4080b90791b1773a32bcf30e31739eccb7c38ce0543aa09fe7ab515
+SIZE (kaigi/freegateway-kaigi-0.2.0-19821989daa21e678f037bd86c53a491bd5c9749_GH0.tar.gz) = 68516304
 SHA256 (kaigi/fresh-2.0.0.tgz) = ad08397ab05f62b2b507682e23aad699cf8cc33922e0030be0cb640a23277ad7
 SIZE (kaigi/fresh-2.0.0.tgz) = 4330
 SHA256 (kaigi/fs-minipass-4.0.1.tgz) = 7ac286e3cccc1ea8980e79e2039def6bb97d3182e17951cd9094f0400ed98236
