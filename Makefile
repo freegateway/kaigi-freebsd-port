@@ -12,13 +12,13 @@ WWW=		https://github.com/freegateway/kaigi
 LICENSE=	AGPLv3
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS=	mediasoup>=3.31.0:www/mediasoup \
+RUN_DEPENDS=	mediasoup>=3.32.0:www/mediasoup \
 		node24>=0:www/node24
 
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	b9ba6c01225fb5fbcbe5e4840caeedff73c3ec0d
+GH_TAGNAME=	fe86820e0b4017260727a826e8f6d1dcf7caebc9
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
