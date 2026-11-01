@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit 0baaf9d69b1201447a379b3195dc06963ba8ed10.
+# Locked production dependencies from Kaigi commit 60c868112a5fa21f7aa7add35a717f1828629a86.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -173,7 +173,7 @@ DISTFILES+=	express-5.3.0.tgz:npm083
 MASTER_SITES+=	https://registry.npmjs.org/express-openid-connect/-/:npm084
 DISTFILES+=	express-openid-connect-3.4.0.tgz:npm084
 MASTER_SITES+=	https://registry.npmjs.org/express-rate-limit/-/:npm085
-DISTFILES+=	express-rate-limit-8.7.1.tgz:npm085
+DISTFILES+=	express-rate-limit-8.7.2.tgz:npm085
 MASTER_SITES+=	https://registry.npmjs.org/fake-mediastreamtrack/-/:npm086
 DISTFILES+=	fake-mediastreamtrack-2.2.1.tgz:npm086
 MASTER_SITES+=	https://registry.npmjs.org/fetch-blob/-/:npm087
@@ -183,7 +183,7 @@ DISTFILES+=	finalhandler-2.1.0.tgz:npm088
 MASTER_SITES+=	https://registry.npmjs.org/flatbuffers/-/:npm089
 DISTFILES+=	flatbuffers-25.9.23.tgz:npm089
 MASTER_SITES+=	https://registry.npmjs.org/follow-redirects/-/:npm090
-DISTFILES+=	follow-redirects-1.16.1.tgz:npm090
+DISTFILES+=	follow-redirects-1.16.2.tgz:npm090
 MASTER_SITES+=	https://registry.npmjs.org/for-each/-/:npm091
 DISTFILES+=	for-each-0.3.5.tgz:npm091
 MASTER_SITES+=	https://registry.npmjs.org/form-data/-/:npm092
@@ -307,7 +307,7 @@ DISTFILES+=	is-weakset-2.0.4.tgz:npm150
 MASTER_SITES+=	https://registry.npmjs.org/isarray/-/:npm151
 DISTFILES+=	isarray-2.0.5.tgz:npm151
 MASTER_SITES+=	https://registry.npmjs.org/joi/-/:npm152
-DISTFILES+=	joi-17.13.8.tgz:npm152
+DISTFILES+=	joi-17.13.9.tgz:npm152
 MASTER_SITES+=	https://registry.npmjs.org/jose/-/:npm153
 DISTFILES+=	jose-6.2.3.tgz:npm153
 MASTER_SITES+=	https://registry.npmjs.org/js-yaml/-/:npm154
@@ -345,7 +345,7 @@ DISTFILES+=	mdn-data-2.27.1.tgz:npm169
 MASTER_SITES+=	https://registry.npmjs.org/media-typer/-/:npm170
 DISTFILES+=	media-typer-1.1.0.tgz:npm170
 MASTER_SITES+=	https://registry.npmjs.org/mediasoup-client/-/:npm171
-DISTFILES+=	mediasoup-client-3.25.3.tgz:npm171
+DISTFILES+=	mediasoup-client-3.26.0.tgz:npm171
 MASTER_SITES+=	https://registry.npmjs.org/merge-descriptors/-/:npm172
 DISTFILES+=	merge-descriptors-2.0.0.tgz:npm172
 MASTER_SITES+=	https://registry.npmjs.org/mime-db/-/:npm173
@@ -419,7 +419,7 @@ DISTFILES+=	proxy-from-env-2.1.0.tgz:npm206
 MASTER_SITES+=	https://registry.npmjs.org/punycode/-/:npm207
 DISTFILES+=	punycode-2.3.1.tgz:npm207
 MASTER_SITES+=	https://registry.npmjs.org/qs/-/:npm208
-DISTFILES+=	qs-6.16.1.tgz:npm208
+DISTFILES+=	qs-6.17.1.tgz:npm208
 MASTER_SITES+=	https://registry.npmjs.org/range-parser/-/:npm209
 DISTFILES+=	range-parser-1.2.1.tgz:npm209
 MASTER_SITES+=	https://registry.npmjs.org/raw-body/-/:npm210
@@ -687,7 +687,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/express-openid-connect/node_modules/depd depd-1.1.2.tgz \
 		node_modules/express-openid-connect/node_modules/http-errors http-errors-1.8.1.tgz \
 		node_modules/express-openid-connect/node_modules/statuses statuses-1.5.0.tgz \
-		node_modules/express-rate-limit express-rate-limit-8.7.1.tgz \
+		node_modules/express-rate-limit express-rate-limit-8.7.2.tgz \
 		node_modules/express/node_modules/accepts accepts-2.0.0.tgz \
 		node_modules/express/node_modules/merge-descriptors merge-descriptors-2.0.0.tgz \
 		node_modules/express/node_modules/negotiator negotiator-1.0.0.tgz \
@@ -695,7 +695,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/fetch-blob fetch-blob-3.2.0.tgz \
 		node_modules/finalhandler finalhandler-2.1.0.tgz \
 		node_modules/flatbuffers flatbuffers-25.9.23.tgz \
-		node_modules/follow-redirects follow-redirects-1.16.1.tgz \
+		node_modules/follow-redirects follow-redirects-1.16.2.tgz \
 		node_modules/for-each for-each-0.3.5.tgz \
 		node_modules/form-data form-data-4.0.6.tgz \
 		node_modules/form-data/node_modules/mime-db mime-db-1.52.0.tgz \
@@ -755,7 +755,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/is-weakref is-weakref-1.1.1.tgz \
 		node_modules/is-weakset is-weakset-2.0.4.tgz \
 		node_modules/isarray isarray-2.0.5.tgz \
-		node_modules/joi joi-17.13.8.tgz \
+		node_modules/joi joi-17.13.9.tgz \
 		node_modules/jose jose-6.2.3.tgz \
 		node_modules/js-yaml js-yaml-5.5.0.tgz \
 		node_modules/jsdom jsdom-30.1.3.tgz \
@@ -776,7 +776,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/math-intrinsics math-intrinsics-1.1.0.tgz \
 		node_modules/mdn-data mdn-data-2.27.1.tgz \
 		node_modules/media-typer media-typer-1.1.0.tgz \
-		node_modules/mediasoup-client mediasoup-client-3.25.3.tgz \
+		node_modules/mediasoup-client mediasoup-client-3.26.0.tgz \
 		node_modules/mime-db mime-db-1.54.0.tgz \
 		node_modules/mime-types mime-types-3.0.2.tgz \
 		node_modules/minipass minipass-7.1.3.tgz \
@@ -804,7 +804,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/proxy-addr proxy-addr-2.0.8.tgz \
 		node_modules/proxy-from-env proxy-from-env-2.1.0.tgz \
 		node_modules/punycode punycode-2.3.1.tgz \
-		node_modules/qs qs-6.16.1.tgz \
+		node_modules/qs qs-6.17.1.tgz \
 		node_modules/range-parser range-parser-1.2.1.tgz \
 		node_modules/raw-body raw-body-3.0.2.tgz \
 		node_modules/readdirp readdirp-5.0.0.tgz \
