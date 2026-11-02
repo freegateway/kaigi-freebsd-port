@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit 27b7536116527da63057d394b690b49ad98d1dfc.
+# Locked production dependencies from Kaigi commit 65e303fd6f264e762c589f4c948be581bb087286.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
