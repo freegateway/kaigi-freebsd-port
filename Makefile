@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.5.4
+DISTVERSION=	0.5.5
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -11,13 +11,13 @@ WWW=		https://github.com/freegateway/kaigi
 LICENSE=	AGPLv3
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS=	mediasoup>=3.32.1:www/mediasoup \
+RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 		node24>=0:www/node24
 
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	85b9490463e1f4917dab4add99fc2c390013b28b
+GH_TAGNAME=	4938e53bd0524120472598d666b56f1c24c72fa5
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
