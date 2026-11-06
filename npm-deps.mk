@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit 4938e53bd0524120472598d666b56f1c24c72fa5.
+# Locked production dependencies from Kaigi commit afc6698ea1f66d0ac994c7f8bf7f224525378c6c.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -32,8 +32,10 @@ MASTER_SITES+=	https://registry.npmjs.org/axios/-/:npm013
 DISTFILES+=	axios-1.20.0.tgz:npm013
 MASTER_SITES+=	https://registry.npmjs.org/base64url/-/:npm014
 DISTFILES+=	base64url-3.0.1.tgz:npm014
-MASTER_SITES+=	https://registry.npmjs.org/bidi-js/-/:npm015
-DISTFILES+=	bidi-js-1.1.0.tgz:npm015
+MASTER_SITES+=	https://registry.npmjs.org/bcp-47/-/:npm291
+DISTFILES+=	bcp-47-2.1.2.tgz:npm291
+MASTER_SITES+=	https://registry.npmjs.org/bcp-47-match/-/:npm292
+DISTFILES+=	bcp-47-match-2.0.3.tgz:npm292
 MASTER_SITES+=	https://registry.npmjs.org/body-parser/-/:npm016
 DISTFILES+=	body-parser-2.3.0.tgz:npm016
 MASTER_SITES+=	https://registry.npmjs.org/buffer-equal-constant-time/-/:npm017
@@ -54,8 +56,6 @@ MASTER_SITES+=	https://registry.npmjs.org/chownr/-/:npm024
 DISTFILES+=	chownr-3.0.0.tgz:npm024
 MASTER_SITES+=	https://registry.npmjs.org/clone/-/:npm025
 DISTFILES+=	clone-2.1.2.tgz:npm025
-MASTER_SITES+=	https://registry.npmjs.org/@csstools/color-helpers/-/:npm026
-DISTFILES+=	color-helpers-6.1.2.tgz:npm026
 MASTER_SITES+=	https://registry.npmjs.org/colors/-/:npm027
 DISTFILES+=	colors-1.4.0.tgz:npm027
 MASTER_SITES+=	https://registry.npmjs.org/combined-stream/-/:npm028
@@ -82,20 +82,6 @@ MASTER_SITES+=	https://registry.npmjs.org/crypto-js/-/:npm038
 DISTFILES+=	crypto-js-4.2.0.tgz:npm038
 MASTER_SITES+=	https://registry.npmjs.org/@lukeed/csprng/-/:npm039
 DISTFILES+=	csprng-1.1.0.tgz:npm039
-MASTER_SITES+=	https://registry.npmjs.org/@csstools/css-calc/-/:npm040
-DISTFILES+=	css-calc-3.4.3.tgz:npm040
-MASTER_SITES+=	https://registry.npmjs.org/@asamuzakjp/css-color/-/:npm041
-DISTFILES+=	css-color-7.1.3.tgz:npm041
-MASTER_SITES+=	https://registry.npmjs.org/@csstools/css-color-parser/-/:npm042
-DISTFILES+=	css-color-parser-4.2.6.tgz:npm042
-MASTER_SITES+=	https://registry.npmjs.org/@csstools/css-parser-algorithms/-/:npm043
-DISTFILES+=	css-parser-algorithms-4.0.2.tgz:npm043
-MASTER_SITES+=	https://registry.npmjs.org/@csstools/css-syntax-patches-for-csstree/-/:npm044
-DISTFILES+=	css-syntax-patches-for-csstree-1.1.15.tgz:npm044
-MASTER_SITES+=	https://registry.npmjs.org/@csstools/css-tokenizer/-/:npm045
-DISTFILES+=	css-tokenizer-4.0.2.tgz:npm045
-MASTER_SITES+=	https://registry.npmjs.org/css-tree/-/:npm046
-DISTFILES+=	css-tree-3.2.1.tgz:npm046
 MASTER_SITES+=	https://registry.npmjs.org/data-uri-to-buffer/-/:npm047
 DISTFILES+=	data-uri-to-buffer-4.0.1.tgz:npm047
 MASTER_SITES+=	https://registry.npmjs.org/data-urls/-/:npm048
@@ -126,8 +112,6 @@ MASTER_SITES+=	https://registry.npmjs.org/depd/-/:npm060
 DISTFILES+=	depd-2.0.0.tgz:npm060
 MASTER_SITES+=	https://registry.npmjs.org/destroy/-/:npm061
 DISTFILES+=	destroy-1.2.0.tgz:npm061
-MASTER_SITES+=	https://registry.npmjs.org/@asamuzakjp/dom-selector/-/:npm062
-DISTFILES+=	dom-selector-10.0.3.tgz:npm062
 MASTER_SITES+=	https://registry.npmjs.org/dompurify/-/:npm063
 DISTFILES+=	dompurify-3.4.17.tgz:npm063
 MASTER_SITES+=	https://registry.npmjs.org/dotenv/-/:npm064
@@ -144,8 +128,8 @@ MASTER_SITES+=	https://registry.npmjs.org/engine.io/-/:npm069
 DISTFILES+=	engine.io-6.6.11.tgz:npm069
 MASTER_SITES+=	https://registry.npmjs.org/engine.io-parser/-/:npm070
 DISTFILES+=	engine.io-parser-5.2.3.tgz:npm070
-MASTER_SITES+=	https://registry.npmjs.org/entities/-/:npm071
-DISTFILES+=	entities-8.0.0.tgz:npm071
+MASTER_SITES+=	https://registry.npmjs.org/entities/-/:npm293
+DISTFILES+=	entities-9.0.0.tgz:npm293
 MASTER_SITES+=	https://registry.npmjs.org/es-abstract/-/:npm072
 DISTFILES+=	es-abstract-1.24.0.tgz:npm072
 MASTER_SITES+=	https://registry.npmjs.org/es-array-method-boxes-properly/-/:npm073
@@ -258,6 +242,10 @@ MASTER_SITES+=	https://registry.npmjs.org/ip-address/-/:npm126
 DISTFILES+=	ip-address-10.7.4.tgz:npm126
 MASTER_SITES+=	https://registry.npmjs.org/ipaddr.js/-/:npm127
 DISTFILES+=	ipaddr.js-1.9.1.tgz:npm127
+MASTER_SITES+=	https://registry.npmjs.org/is-alphabetical/-/:npm294
+DISTFILES+=	is-alphabetical-2.0.1.tgz:npm294
+MASTER_SITES+=	https://registry.npmjs.org/is-alphanumerical/-/:npm295
+DISTFILES+=	is-alphanumerical-2.0.1.tgz:npm295
 MASTER_SITES+=	https://registry.npmjs.org/is-array-buffer/-/:npm128
 DISTFILES+=	is-array-buffer-3.0.5.tgz:npm128
 MASTER_SITES+=	https://registry.npmjs.org/is-async-function/-/:npm129
@@ -272,6 +260,8 @@ MASTER_SITES+=	https://registry.npmjs.org/is-data-view/-/:npm133
 DISTFILES+=	is-data-view-1.0.2.tgz:npm133
 MASTER_SITES+=	https://registry.npmjs.org/is-date-object/-/:npm134
 DISTFILES+=	is-date-object-1.1.0.tgz:npm134
+MASTER_SITES+=	https://registry.npmjs.org/is-decimal/-/:npm296
+DISTFILES+=	is-decimal-2.0.1.tgz:npm296
 MASTER_SITES+=	https://registry.npmjs.org/is-finalizationregistry/-/:npm135
 DISTFILES+=	is-finalizationregistry-1.1.1.tgz:npm135
 MASTER_SITES+=	https://registry.npmjs.org/is-generator-function/-/:npm136
@@ -312,8 +302,8 @@ MASTER_SITES+=	https://registry.npmjs.org/jose/-/:npm153
 DISTFILES+=	jose-6.2.3.tgz:npm153
 MASTER_SITES+=	https://registry.npmjs.org/js-yaml/-/:npm154
 DISTFILES+=	js-yaml-5.5.0.tgz:npm154
-MASTER_SITES+=	https://registry.npmjs.org/jsdom/-/:npm155
-DISTFILES+=	jsdom-30.1.3.tgz:npm155
+MASTER_SITES+=	https://registry.npmjs.org/jsdom/-/:npm297
+DISTFILES+=	jsdom-31.0.0.tgz:npm297
 MASTER_SITES+=	https://registry.npmjs.org/jsonwebtoken/-/:npm156
 DISTFILES+=	jsonwebtoken-9.0.3.tgz:npm156
 MASTER_SITES+=	https://registry.npmjs.org/jwa/-/:npm157
@@ -340,8 +330,6 @@ MASTER_SITES+=	https://registry.npmjs.org/lru-cache/-/:npm167
 DISTFILES+=	lru-cache-11.5.3.tgz:npm167
 MASTER_SITES+=	https://registry.npmjs.org/math-intrinsics/-/:npm168
 DISTFILES+=	math-intrinsics-1.1.0.tgz:npm168
-MASTER_SITES+=	https://registry.npmjs.org/mdn-data/-/:npm169
-DISTFILES+=	mdn-data-2.27.1.tgz:npm169
 MASTER_SITES+=	https://registry.npmjs.org/media-typer/-/:npm170
 DISTFILES+=	media-typer-1.1.0.tgz:npm170
 MASTER_SITES+=	https://registry.npmjs.org/mediasoup-client/-/:npm171
@@ -402,8 +390,10 @@ MASTER_SITES+=	https://registry.npmjs.org/openid-client/-/:npm198
 DISTFILES+=	openid-client-6.8.4.tgz:npm198
 MASTER_SITES+=	https://registry.npmjs.org/own-keys/-/:npm199
 DISTFILES+=	own-keys-1.0.1.tgz:npm199
-MASTER_SITES+=	https://registry.npmjs.org/parse5/-/:npm200
-DISTFILES+=	parse5-8.0.1.tgz:npm200
+MASTER_SITES+=	https://registry.npmjs.org/parse5/-/:npm298
+DISTFILES+=	parse5-8.1.0.tgz:npm298
+MASTER_SITES+=	https://registry.npmjs.org/parse5-parser-stream/-/:npm299
+DISTFILES+=	parse5-parser-stream-8.1.0.tgz:npm299
 MASTER_SITES+=	https://registry.npmjs.org/parseurl/-/:npm201
 DISTFILES+=	parseurl-1.3.3.tgz:npm201
 MASTER_SITES+=	https://registry.npmjs.org/path-to-regexp/-/:npm202
@@ -430,8 +420,6 @@ MASTER_SITES+=	https://registry.npmjs.org/reflect.getprototypeof/-/:npm212
 DISTFILES+=	reflect.getprototypeof-1.0.10.tgz:npm212
 MASTER_SITES+=	https://registry.npmjs.org/regexp.prototype.flags/-/:npm213
 DISTFILES+=	regexp.prototype.flags-1.5.4.tgz:npm213
-MASTER_SITES+=	https://registry.npmjs.org/require-from-string/-/:npm214
-DISTFILES+=	require-from-string-2.0.2.tgz:npm214
 MASTER_SITES+=	https://registry.npmjs.org/router/-/:npm215
 DISTFILES+=	router-2.2.0.tgz:npm215
 MASTER_SITES+=	https://registry.npmjs.org/safe-array-concat/-/:npm216
@@ -480,10 +468,6 @@ MASTER_SITES+=	https://registry.npmjs.org/socket.io-adapter/-/:npm237
 DISTFILES+=	socket.io-adapter-2.5.8.tgz:npm237
 MASTER_SITES+=	https://registry.npmjs.org/socket.io-parser/-/:npm238
 DISTFILES+=	socket.io-parser-4.2.7.tgz:npm238
-MASTER_SITES+=	https://registry.npmjs.org/source-map-js/-/:npm239
-DISTFILES+=	source-map-js-1.2.2.tgz:npm239
-MASTER_SITES+=	https://registry.npmjs.org/@bramus/specificity/-/:npm240
-DISTFILES+=	specificity-2.4.2.tgz:npm240
 MASTER_SITES+=	https://registry.npmjs.org/statuses/-/:npm241
 DISTFILES+=	statuses-1.5.0.tgz:npm241
 MASTER_SITES+=	https://registry.npmjs.org/statuses/-/:npm242
@@ -536,8 +520,8 @@ MASTER_SITES+=	https://registry.npmjs.org/typed-array-length/-/:npm265
 DISTFILES+=	typed-array-length-1.0.7.tgz:npm265
 MASTER_SITES+=	https://registry.npmjs.org/unbox-primitive/-/:npm266
 DISTFILES+=	unbox-primitive-1.1.0.tgz:npm266
-MASTER_SITES+=	https://registry.npmjs.org/undici/-/:npm267
-DISTFILES+=	undici-8.12.1.tgz:npm267
+MASTER_SITES+=	https://registry.npmjs.org/undici/-/:npm300
+DISTFILES+=	undici-8.12.4.tgz:npm300
 MASTER_SITES+=	https://registry.npmjs.org/undici-types/-/:npm268
 DISTFILES+=	undici-types-6.20.0.tgz:npm268
 MASTER_SITES+=	https://registry.npmjs.org/unpipe/-/:npm269
@@ -562,8 +546,8 @@ MASTER_SITES+=	https://registry.npmjs.org/webidl-conversions/-/:npm278
 DISTFILES+=	webidl-conversions-8.0.1.tgz:npm278
 MASTER_SITES+=	https://registry.npmjs.org/whatwg-mimetype/-/:npm279
 DISTFILES+=	whatwg-mimetype-5.0.0.tgz:npm279
-MASTER_SITES+=	https://registry.npmjs.org/whatwg-url/-/:npm280
-DISTFILES+=	whatwg-url-17.2.0.tgz:npm280
+MASTER_SITES+=	https://registry.npmjs.org/whatwg-url/-/:npm301
+DISTFILES+=	whatwg-url-17.3.0.tgz:npm301
 MASTER_SITES+=	https://registry.npmjs.org/which-boxed-primitive/-/:npm281
 DISTFILES+=	which-boxed-primitive-1.1.1.tgz:npm281
 MASTER_SITES+=	https://registry.npmjs.org/which-builtin-type/-/:npm282
@@ -585,16 +569,7 @@ DISTFILES+=	xmlchars-2.2.0.tgz:npm289
 MASTER_SITES+=	https://registry.npmjs.org/yallist/-/:npm290
 DISTFILES+=	yallist-5.0.0.tgz:npm290
 
-_NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
-		node_modules/@asamuzakjp/dom-selector dom-selector-10.0.3.tgz \
-		node_modules/@bramus/specificity specificity-2.4.2.tgz \
-		node_modules/@csstools/color-helpers color-helpers-6.1.2.tgz \
-		node_modules/@csstools/css-calc css-calc-3.4.3.tgz \
-		node_modules/@csstools/css-color-parser css-color-parser-4.2.6.tgz \
-		node_modules/@csstools/css-parser-algorithms css-parser-algorithms-4.0.2.tgz \
-		node_modules/@csstools/css-syntax-patches-for-csstree css-syntax-patches-for-csstree-1.1.15.tgz \
-		node_modules/@csstools/css-tokenizer css-tokenizer-4.0.2.tgz \
-		node_modules/@exodus/bytes bytes-1.16.0.tgz \
+_NPM_MODULES=	node_modules/@exodus/bytes bytes-1.16.0.tgz \
 		node_modules/@hapi/hoek hoek-9.3.0.tgz \
 		node_modules/@hapi/topo topo-5.1.0.tgz \
 		node_modules/@isaacs/fs-minipass fs-minipass-4.0.1.tgz \
@@ -628,7 +603,8 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/awaitqueue awaitqueue-3.3.1.tgz \
 		node_modules/axios axios-1.20.0.tgz \
 		node_modules/base64url base64url-3.0.1.tgz \
-		node_modules/bidi-js bidi-js-1.1.0.tgz \
+		node_modules/bcp-47 bcp-47-2.1.2.tgz \
+		node_modules/bcp-47-match bcp-47-match-2.0.3.tgz \
 		node_modules/body-parser body-parser-2.3.0.tgz \
 		node_modules/buffer-equal-constant-time buffer-equal-constant-time-1.0.1.tgz \
 		node_modules/bytes bytes-3.1.2.tgz \
@@ -650,7 +626,6 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/cookie-signature cookie-signature-1.2.2.tgz \
 		node_modules/cors cors-2.8.6.tgz \
 		node_modules/crypto-js crypto-js-4.2.0.tgz \
-		node_modules/css-tree css-tree-3.2.1.tgz \
 		node_modules/data-uri-to-buffer data-uri-to-buffer-4.0.1.tgz \
 		node_modules/data-urls data-urls-8.0.0.tgz \
 		node_modules/data-view-buffer data-view-buffer-1.0.2.tgz \
@@ -671,7 +646,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/encodeurl encodeurl-2.0.0.tgz \
 		node_modules/engine.io engine.io-6.6.11.tgz \
 		node_modules/engine.io-parser engine.io-parser-5.2.3.tgz \
-		node_modules/entities entities-8.0.0.tgz \
+		node_modules/entities entities-9.0.0.tgz \
 		node_modules/es-abstract es-abstract-1.24.0.tgz \
 		node_modules/es-array-method-boxes-properly es-array-method-boxes-properly-1.0.0.tgz \
 		node_modules/es-define-property es-define-property-1.0.1.tgz \
@@ -731,6 +706,8 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/internal-slot internal-slot-1.1.0.tgz \
 		node_modules/ip-address ip-address-10.7.4.tgz \
 		node_modules/ipaddr.js ipaddr.js-1.9.1.tgz \
+		node_modules/is-alphabetical is-alphabetical-2.0.1.tgz \
+		node_modules/is-alphanumerical is-alphanumerical-2.0.1.tgz \
 		node_modules/is-array-buffer is-array-buffer-3.0.5.tgz \
 		node_modules/is-async-function is-async-function-2.1.1.tgz \
 		node_modules/is-bigint is-bigint-1.1.0.tgz \
@@ -738,6 +715,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/is-callable is-callable-1.2.7.tgz \
 		node_modules/is-data-view is-data-view-1.0.2.tgz \
 		node_modules/is-date-object is-date-object-1.1.0.tgz \
+		node_modules/is-decimal is-decimal-2.0.1.tgz \
 		node_modules/is-finalizationregistry is-finalizationregistry-1.1.1.tgz \
 		node_modules/is-generator-function is-generator-function-1.1.2.tgz \
 		node_modules/is-map is-map-2.0.3.tgz \
@@ -758,8 +736,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/joi joi-17.13.9.tgz \
 		node_modules/jose jose-6.2.3.tgz \
 		node_modules/js-yaml js-yaml-5.5.0.tgz \
-		node_modules/jsdom jsdom-30.1.3.tgz \
-		node_modules/jsdom/node_modules/undici undici-8.12.1.tgz \
+		node_modules/jsdom jsdom-31.0.0.tgz \
 		node_modules/jsonwebtoken jsonwebtoken-9.0.3.tgz \
 		node_modules/jsonwebtoken/node_modules/semver semver-7.7.1.tgz \
 		node_modules/jwa jwa-2.0.1.tgz \
@@ -774,7 +751,6 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/lodash.once lodash.once-4.1.1.tgz \
 		node_modules/lru-cache lru-cache-11.5.3.tgz \
 		node_modules/math-intrinsics math-intrinsics-1.1.0.tgz \
-		node_modules/mdn-data mdn-data-2.27.1.tgz \
 		node_modules/media-typer media-typer-1.1.0.tgz \
 		node_modules/mediasoup-client mediasoup-client-3.26.0.tgz \
 		node_modules/mime-db mime-db-1.54.0.tgz \
@@ -797,7 +773,8 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/once once-1.4.0.tgz \
 		node_modules/openid-client openid-client-6.8.4.tgz \
 		node_modules/own-keys own-keys-1.0.1.tgz \
-		node_modules/parse5 parse5-8.0.1.tgz \
+		node_modules/parse5 parse5-8.1.0.tgz \
+		node_modules/parse5-parser-stream parse5-parser-stream-8.1.0.tgz \
 		node_modules/parseurl parseurl-1.3.3.tgz \
 		node_modules/path-to-regexp path-to-regexp-8.4.2.tgz \
 		node_modules/possible-typed-array-names possible-typed-array-names-1.1.0.tgz \
@@ -810,7 +787,6 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/readdirp readdirp-5.0.0.tgz \
 		node_modules/reflect.getprototypeof reflect.getprototypeof-1.0.10.tgz \
 		node_modules/regexp.prototype.flags regexp.prototype.flags-1.5.4.tgz \
-		node_modules/require-from-string require-from-string-2.0.2.tgz \
 		node_modules/router router-2.2.0.tgz \
 		node_modules/safe-array-concat safe-array-concat-1.1.3.tgz \
 		node_modules/safe-buffer safe-buffer-5.2.1.tgz \
@@ -833,7 +809,6 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/socket.io socket.io-4.8.4.tgz \
 		node_modules/socket.io-adapter socket.io-adapter-2.5.8.tgz \
 		node_modules/socket.io-parser socket.io-parser-4.2.7.tgz \
-		node_modules/source-map-js source-map-js-1.2.2.tgz \
 		node_modules/statuses statuses-2.0.2.tgz \
 		node_modules/stop-iteration-iterator stop-iteration-iterator-1.1.0.tgz \
 		node_modules/strict-event-emitter-types strict-event-emitter-types-2.0.0.tgz \
@@ -857,6 +832,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/typed-array-byte-offset typed-array-byte-offset-1.0.4.tgz \
 		node_modules/typed-array-length typed-array-length-1.0.7.tgz \
 		node_modules/unbox-primitive unbox-primitive-1.1.0.tgz \
+		node_modules/undici undici-8.12.4.tgz \
 		node_modules/undici-types undici-types-6.20.0.tgz \
 		node_modules/unpipe unpipe-1.0.0.tgz \
 		node_modules/url-join url-join-4.0.1.tgz \
@@ -868,7 +844,7 @@ _NPM_MODULES=	node_modules/@asamuzakjp/css-color css-color-7.1.3.tgz \
 		node_modules/web-streams-polyfill web-streams-polyfill-3.3.3.tgz \
 		node_modules/webidl-conversions webidl-conversions-8.0.1.tgz \
 		node_modules/whatwg-mimetype whatwg-mimetype-5.0.0.tgz \
-		node_modules/whatwg-url whatwg-url-17.2.0.tgz \
+		node_modules/whatwg-url whatwg-url-17.3.0.tgz \
 		node_modules/which-boxed-primitive which-boxed-primitive-1.1.1.tgz \
 		node_modules/which-builtin-type which-builtin-type-1.2.1.tgz \
 		node_modules/which-collection which-collection-1.0.2.tgz \
