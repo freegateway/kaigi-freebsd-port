@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.5.7
+DISTVERSION=	0.5.8
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -17,7 +17,7 @@ RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	afc6698ea1f66d0ac994c7f8bf7f224525378c6c
+GH_TAGNAME=	c73e88a4dddfd9eb8fcb6bda06426f81b0df3042
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
