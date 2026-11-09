@@ -41,10 +41,13 @@ validate the result in Poudriere. Application development and port revisions
 are maintained separately; the port does not track a moving application branch.
 
 Run `make corresponding-source` in the port directory to collect this port and
-its checksummed inputs. Publish the result at the URL embedded in the package,
-and include the matching mediasoup port and other required source and build
-material for the deployed combination. A repository link alone does not
-identify the complete Corresponding Source of a particular installation.
+its checksummed inputs. The package links to the matching
+[GitHub release](https://github.com/freegateway/kaigi-freebsd-port/releases):
+use the package name (including any revision) as the tag and publish the
+archive as `${PKGNAME}-source.tar.xz`. Include the matching mediasoup port
+and other required source and build material for the deployed combination.
+A repository link alone does not identify the complete Corresponding Source
+of a particular installation.
 
 Application and bundled-component copyright and licence notices remain with
 their source. This repository’s licence is in [LICENSE](LICENSE).
