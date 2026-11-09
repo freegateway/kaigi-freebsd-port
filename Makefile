@@ -33,7 +33,7 @@ _CORRESPONDING_SOURCE_DIR=	${WRKDIR}/corresponding-source
 _CORRESPONDING_USR_DIR=		${_CORRESPONDING_SOURCE_DIR}/usr
 _CORRESPONDING_USR_PORTS_DIR=	${_CORRESPONDING_USR_DIR}/ports
 _CORRESPONDING_SOURCE_FILE=	/tmp/${PKGNAME}-source.tar.xz
-_KAIGI_SOURCE_URL=		https://dev.freegateway.org/freebsd/corresponding_source/kaigi/${PKGNAME}-source.tar.xz
+_KAIGI_SOURCE_URL=		https://github.com/freegateway/kaigi-freebsd-port/releases/download/${PKGNAME}/${PKGNAME}-source.tar.xz
 _NPM_DISTDIR=			${DISTDIR}/${DIST_SUBDIR}
 
 .include <bsd.port.options.mk>
