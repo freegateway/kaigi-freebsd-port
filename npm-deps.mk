@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit afc6698ea1f66d0ac994c7f8bf7f224525378c6c.
+# Locked production dependencies from Kaigi commit bc2ac13c0840056477b007a0d62f6d6988d00340.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -157,7 +157,7 @@ DISTFILES+=	express-5.3.0.tgz:npm083
 MASTER_SITES+=	https://registry.npmjs.org/express-openid-connect/-/:npm084
 DISTFILES+=	express-openid-connect-3.4.0.tgz:npm084
 MASTER_SITES+=	https://registry.npmjs.org/express-rate-limit/-/:npm085
-DISTFILES+=	express-rate-limit-8.7.3.tgz:npm085
+DISTFILES+=	express-rate-limit-8.7.4.tgz:npm085
 MASTER_SITES+=	https://registry.npmjs.org/fake-mediastreamtrack/-/:npm086
 DISTFILES+=	fake-mediastreamtrack-2.2.1.tgz:npm086
 MASTER_SITES+=	https://registry.npmjs.org/fetch-blob/-/:npm087
@@ -662,7 +662,7 @@ _NPM_MODULES=	node_modules/@exodus/bytes bytes-1.16.0.tgz \
 		node_modules/express-openid-connect/node_modules/depd depd-1.1.2.tgz \
 		node_modules/express-openid-connect/node_modules/http-errors http-errors-1.8.1.tgz \
 		node_modules/express-openid-connect/node_modules/statuses statuses-1.5.0.tgz \
-		node_modules/express-rate-limit express-rate-limit-8.7.3.tgz \
+		node_modules/express-rate-limit express-rate-limit-8.7.4.tgz \
 		node_modules/express/node_modules/accepts accepts-2.0.0.tgz \
 		node_modules/express/node_modules/merge-descriptors merge-descriptors-2.0.0.tgz \
 		node_modules/express/node_modules/negotiator negotiator-1.0.0.tgz \
