@@ -101,8 +101,6 @@ do-install:
 		${STAGEDIR}${ETCDIR}/users.sample
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/group-meetings.json.sample \
 		${STAGEDIR}${ETCDIR}/ldap/group-meetings.json.sample
-	${LN} -s ../../../etc/kaigi/site-assets \
-		${STAGEDIR}${WWWDIR}/public/site-assets
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/man/man8 \
 		${STAGEDIR}${PREFIX}/share/man/man5
 	${INSTALL_MAN} ${WRKDIR}/kaigi.8 \
@@ -115,7 +113,7 @@ do-install:
 .for doc in README.md HARDENING.md
 	${INSTALL_DATA} ${WRKSRC}/${doc} ${STAGEDIR}${DOCSDIR}/${doc}
 .endfor
-.for doc in BASELINE.md UPSTREAM.md vendor-files.json
+.for doc in BASELINE.md UPSTREAM.md INSTANCES.md vendor-files.json
 	${INSTALL_DATA} ${WRKSRC}/docs/${doc} ${STAGEDIR}${DOCSDIR}/${doc}
 .endfor
 	${MKDIR} ${STAGEDIR}${EXAMPLESDIR}/fail2ban
