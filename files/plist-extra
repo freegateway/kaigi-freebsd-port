@@ -16,6 +16,7 @@ share/man/man5/kaigi-ldap.conf.5.gz
 %%DOCSDIR%%/HARDENING.md
 %%DOCSDIR%%/BASELINE.md
 %%DOCSDIR%%/UPSTREAM.md
+%%DOCSDIR%%/INSTANCES.md
 %%DOCSDIR%%/vendor-files.json
 %%EXAMPLESDIR%%/fail2ban/kaigi.conf
 etc/newsyslog.conf.d/kaigi.conf

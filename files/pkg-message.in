@@ -14,6 +14,9 @@ LDAP support is included, disabled by default; configure ldap/ldap.conf and
 ldap/group-meetings.json before setting LDAP_ENABLED=true.
 MiroTalk may coexist using its own service and settings.
 Choose distinct listener addresses or ports when running both services.
+Named Kaigi instances are selected with kaigi_instances in rc.conf. Each needs
+its own configuration directory, web port/public URL and disjoint media ports.
+See the NAMED INSTANCES section of kaigi(8) before enabling this mode.
 
 See kaigi(8), kaigi.conf(5), kaigi-ldap.conf(5), and
 %%DOCSDIR%%/BASELINE.md for the pending release validation gates.
