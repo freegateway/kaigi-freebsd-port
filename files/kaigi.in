@@ -8,60 +8,169 @@
 
 name="kaigi"
 rcvar="kaigi_enable"
-
 load_rc_config "$name"
 
 : ${kaigi_enable:="NO"}
+: ${kaigi_instances:="default"}
 : ${kaigi_daemon_user:="www"}
 : ${kaigi_daemon_group:="www"}
 
-pidfile="/var/run/kaigi/${name}.pid"
-procname="%%LOCALBASE%%/bin/node"
-command="/usr/sbin/daemon"
-command_args="-f -p ${pidfile} -u ${kaigi_daemon_user} -o /var/log/kaigi/kaigi.log %%LOCALBASE%%/bin/node app/src/Server.js"
+kaigi_action="${1:-}"
+if [ "$#" -gt 2 ]; then
+	echo "Usage: $0 action [instance]"
+	exit 1
+fi
 
-KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi"
-KAIGI_SOURCE_URL="%%KAIGI_SOURCE_URL%%"
-export KAIGI_CONFIG_DIR KAIGI_SOURCE_URL
+# Validate the entire list before operating. Never expand malformed globs.
+set -f
+kaigi_seen=" "
+for kaigi_instance in ${kaigi_instances}; do
+	case "${kaigi_instance}" in
+		[a-z]*) ;;
+		*) echo "kaigi: instance names must begin with a lowercase letter"; exit 1 ;;
+	esac
+	case "${kaigi_instance}" in
+		*[!a-z0-9_]*) echo "kaigi: invalid instance name: ${kaigi_instance}"; exit 1 ;;
+	esac
+	if [ "${#kaigi_instance}" -gt 32 ]; then
+		echo "kaigi: instance names must not exceed 32 characters"
+		exit 1
+	fi
+	case "${kaigi_seen}" in
+		*" ${kaigi_instance} "*) echo "kaigi: duplicate instance: ${kaigi_instance}"; exit 1 ;;
+	esac
+	kaigi_seen="${kaigi_seen}${kaigi_instance} "
+done
 
-start_precmd="kaigi_precmd"
+kaigi_selected="${kaigi_instances}"
+if [ -n "${2:-}" ]; then
+	case "$2" in
+		*[!a-z0-9_]*) echo "kaigi: invalid requested instance"; exit 1 ;;
+	esac
+	case "${kaigi_seen}" in
+		*" $2 "*) kaigi_selected="$2" ;;
+		*) echo "kaigi: instance is not configured: $2"; exit 1 ;;
+	esac
+fi
+set +f
+
+kaigi_directory()
+{
+	if [ -L "$1" ]; then
+		echo "${name}: directory must not be a symlink: $1"
+		return 1
+	fi
+	install -d -m "$2" -o "$3" -g "$4" "$1"
+}
 
 kaigi_precmd()
 {
-	install -d -m 0750 -o "${kaigi_daemon_user}" -g "${kaigi_daemon_group}" /var/run/kaigi || return 1
-	install -d -m 0750 -o "${kaigi_daemon_user}" -g "${kaigi_daemon_group}" /var/log/kaigi || return 1
-	install -d -m 0755 -o root -g wheel "%%PREFIX%%/etc/kaigi" || return 1
-
-	if [ ! -r "%%PREFIX%%/etc/kaigi/kaigi.conf" ]; then
-		echo "${name}: configuration file is not readable: %%PREFIX%%/etc/kaigi/kaigi.conf"
-		return 1
+	# Root controls PID directories; service accounts cannot replace PID files.
+	kaigi_directory /var/run/kaigi 0755 root wheel || return 1
+	kaigi_directory /var/log/kaigi 0755 root wheel || return 1
+	kaigi_directory "${kaigi_run_dir}" 0755 root wheel || return 1
+	kaigi_directory "${kaigi_log_dir}" 0755 root wheel || return 1
+	if [ "${KAIGI_INSTANCE}" != "default" ]; then
+		if [ ! -f "%%WWWDIR%%/app/src/InstancePaths.js" ]; then
+			echo "${name}: installed Kaigi does not support named instances"
+			return 1
+		fi
+		kaigi_directory /var/db/kaigi 0755 root wheel || return 1
+		kaigi_directory "${KAIGI_STATE_DIR}" 0700 "${kaigi_run_user}" "${kaigi_run_group}" || return 1
 	fi
 
-	if [ -L "%%PREFIX%%/etc/kaigi/jwt-secret" ]; then
+	for kaigi_file in kaigi.conf users; do
+		if [ ! -f "${KAIGI_CONFIG_DIR}/${kaigi_file}" ] || [ ! -r "${KAIGI_CONFIG_DIR}/${kaigi_file}" ]; then
+			echo "${name}: missing or unreadable file: ${KAIGI_CONFIG_DIR}/${kaigi_file}"
+			return 1
+		fi
+	done
+	kaigi_secret_file="${KAIGI_CONFIG_DIR}/jwt-secret"
+	if [ -L "${kaigi_secret_file}" ]; then
 		echo "${name}: jwt-secret must not be a symlink"
 		return 1
 	fi
-
-	if [ ! -f "%%PREFIX%%/etc/kaigi/jwt-secret" ]; then
-		umask 077
-		dd if=/dev/urandom bs=32 count=1 2>/dev/null | hexdump -ve '1/1 "%02x"' > "%%PREFIX%%/etc/kaigi/jwt-secret" || return 1
+	if [ ! -e "${kaigi_secret_file}" ]; then
+		kaigi_secret=$(/usr/bin/openssl rand -hex 32) || return 1
+		(umask 077; set -C; printf '%s\n' "${kaigi_secret}" > "${kaigi_secret_file}") || return 1
+		unset kaigi_secret
 	fi
-
-	JWT_SECRET="$(cat "%%PREFIX%%/etc/kaigi/jwt-secret")" || return 1
-	if [ -z "${JWT_SECRET}" ]; then
-		echo "${name}: JWT secret file is empty: %%PREFIX%%/etc/kaigi/jwt-secret"
+	if [ ! -f "${kaigi_secret_file}" ]; then
+		echo "${name}: jwt-secret must be a regular file"
 		return 1
 	fi
-	export JWT_SECRET
-
-	if [ ! -r "%%PREFIX%%/etc/kaigi/users" ]; then
-		echo "${name}: users file is not readable: %%PREFIX%%/etc/kaigi/users"
+	JWT_SECRET="$(cat "${kaigi_secret_file}")" || return 1
+	if [ "${#JWT_SECRET}" -lt 32 ]; then
+		echo "${name}: JWT secret must contain at least 32 characters"
 		return 1
 	fi
-	HOST_USERS="$(cat "%%PREFIX%%/etc/kaigi/users")" || return 1
-	export HOST_USERS
+	HOST_USERS="$(cat "${KAIGI_CONFIG_DIR}/users")" || return 1
+	export JWT_SECRET HOST_USERS
 
+	for kaigi_file in "${pidfile}" "${kaigi_supervisor_pidfile}" "${kaigi_log_dir}/kaigi.log"; do
+		if [ -L "${kaigi_file}" ]; then
+			echo "${name}: runtime file must not be a symlink: ${kaigi_file}"
+			return 1
+		fi
+	done
+	# Rotation signals this instance's supervisor, not Node or syslogd.
+	if [ "${KAIGI_INSTANCE}" != "default" ]; then
+		kaigi_directory /var/run/kaigi/newsyslog 0755 root wheel || return 1
+		kaigi_rotation="/var/run/kaigi/newsyslog/${KAIGI_INSTANCE}.conf"
+		if [ -L "${kaigi_rotation}" ]; then
+			echo "${name}: rotation entry must not be a symlink"
+			return 1
+		fi
+		(umask 022; printf '%s\t640\t7\t1000\t*\tJC\t%s\n' "${kaigi_log_dir}/kaigi.log" "${kaigi_supervisor_pidfile}" > "${kaigi_rotation}") || return 1
+	fi
 	cd "%%WWWDIR%%" || return 1
 }
 
-run_rc_command "$1"
+kaigi_run_instance()
+(
+	KAIGI_INSTANCE="$1"
+	kaigi_run_user="${kaigi_daemon_user}"
+	kaigi_run_group="${kaigi_daemon_group}"
+	unset KAIGI_STATE_DIR
+	if [ "${KAIGI_INSTANCE}" = "default" ]; then
+		name="kaigi"
+		KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi"
+		kaigi_run_dir="/var/run/kaigi"
+		kaigi_log_dir="/var/log/kaigi"
+	else
+		name="kaigi_${KAIGI_INSTANCE}"
+		KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi/instances/${KAIGI_INSTANCE}"
+		KAIGI_STATE_DIR="/var/db/kaigi/${KAIGI_INSTANCE}"
+		kaigi_run_dir="/var/run/kaigi/${KAIGI_INSTANCE}"
+		kaigi_log_dir="/var/log/kaigi/${KAIGI_INSTANCE}"
+		eval "kaigi_run_user=\${kaigi_${KAIGI_INSTANCE}_daemon_user:-\$kaigi_run_user}"
+		eval "kaigi_run_group=\${kaigi_${KAIGI_INSTANCE}_daemon_group:-\$kaigi_run_group}"
+		export KAIGI_STATE_DIR
+	fi
+	rcvar="kaigi_enable"
+	pidfile="${kaigi_run_dir}/kaigi.pid"
+	kaigi_supervisor_pidfile="${kaigi_run_dir}/daemon.pid"
+	# Validate before rc.subr reads a PID file, including stop/status paths.
+	for kaigi_path in /var/run/kaigi "${kaigi_run_dir}" "${pidfile}" "${kaigi_supervisor_pidfile}"; do
+		if [ -L "${kaigi_path}" ]; then
+			echo "${name}: runtime path must not be a symlink: ${kaigi_path}"
+			exit 1
+		fi
+	done
+	procname="%%LOCALBASE%%/bin/node"
+	command="/usr/sbin/daemon"
+	command_args="-f -H -p ${pidfile} -P ${kaigi_supervisor_pidfile} -u ${kaigi_run_user} -o ${kaigi_log_dir}/kaigi.log %%LOCALBASE%%/bin/node app/src/Server.js"
+	KAIGI_SOURCE_URL="%%KAIGI_SOURCE_URL%%"
+	export KAIGI_INSTANCE KAIGI_CONFIG_DIR KAIGI_SOURCE_URL
+	start_precmd="kaigi_precmd"
+	run_rc_command "${kaigi_action}"
+)
+
+kaigi_result=0
+for kaigi_instance in ${kaigi_selected}; do
+	echo "==> Kaigi instance: ${kaigi_instance}"
+	if ! kaigi_run_instance "${kaigi_instance}"; then
+		kaigi_result=1
+	fi
+done
+exit "${kaigi_result}"

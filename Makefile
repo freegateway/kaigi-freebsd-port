@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.5.11
+DISTVERSION=	0.5.12
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -17,7 +17,7 @@ RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	bc2ac13c0840056477b007a0d62f6d6988d00340
+GH_TAGNAME=	9528bc05a9b80531b5d89980a2a34db5519baa3d
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
@@ -101,8 +101,6 @@ do-install:
 		${STAGEDIR}${ETCDIR}/users.sample
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/group-meetings.json.sample \
 		${STAGEDIR}${ETCDIR}/ldap/group-meetings.json.sample
-	${LN} -s ../../../etc/kaigi/site-assets \
-		${STAGEDIR}${WWWDIR}/public/site-assets
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/man/man8 \
 		${STAGEDIR}${PREFIX}/share/man/man5
 	${INSTALL_MAN} ${WRKDIR}/kaigi.8 \
@@ -115,7 +113,7 @@ do-install:
 .for doc in README.md HARDENING.md
 	${INSTALL_DATA} ${WRKSRC}/${doc} ${STAGEDIR}${DOCSDIR}/${doc}
 .endfor
-.for doc in BASELINE.md UPSTREAM.md vendor-files.json
+.for doc in BASELINE.md UPSTREAM.md INSTANCES.md vendor-files.json
 	${INSTALL_DATA} ${WRKSRC}/docs/${doc} ${STAGEDIR}${DOCSDIR}/${doc}
 .endfor
 	${MKDIR} ${STAGEDIR}${EXAMPLESDIR}/fail2ban

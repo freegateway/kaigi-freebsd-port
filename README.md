@@ -20,6 +20,22 @@ The service is `kaigi`; settings live in `/usr/local/etc/kaigi/kaigi.conf`.
 Configure users, meeting permissions, TLS and media addresses before starting
 it. See the installed `kaigi(8)`, `kaigi.conf(5)` and `kaigi-ldap.conf(5)` manuals.
 
+## Named instances
+
+Named-instance support requires Kaigi 0.5.12 or newer. The service refuses named
+starts on older application code.
+
+Set `kaigi_instances="staff public"` in rc.conf, and provision separate
+`/usr/local/etc/kaigi/instances/staff` and `public` configuration trees.
+Leaving the setting unset retains the original default instance. Use, for
+example, `service kaigi restart staff`; omitting the name acts on the whole list.
+Each instance needs its own web port/public URL and non-overlapping TCP/UDP media
+ranges. Separate service accounts are optional but recommended for isolation.
+
+Run `node --test tests/test-rc.cjs` to check dispatch and preflight behavior.
+The native rc.subr/daemon lifecycle and log-reopening test runs only as root on
+FreeBSD, in temporary directories with loopback-only fixture servers.
+
 ## Source and dependencies
 
 `GH_TAGNAME` selects an exact Kaigi commit. `distinfo` records the checksums and
