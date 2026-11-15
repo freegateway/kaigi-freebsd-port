@@ -123,8 +123,8 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/kaigi/fail2ban
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/kaigi.conf \
 		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/kaigi.conf
-	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/README.md \
-		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/README.md
+	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/README.txt \
+		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/README.txt
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/newsyslog.conf.d
 	${INSTALL_DATA} ${WRKDIR}/kaigi.newsyslog.conf \
 		${STAGEDIR}${PREFIX}/etc/newsyslog.conf.d/kaigi.conf
