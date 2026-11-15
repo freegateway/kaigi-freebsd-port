@@ -28,7 +28,8 @@ SUB_FILES=	kaigi kaigi.newsyslog.conf pkg-message
 SUB_LIST=	KAIGI_SOURCE_URL=${_KAIGI_SOURCE_URL}
 
 _KAIGI_APP_TEMPLATES=		kaigi.8 kaigi.conf.5 kaigi-ldap.conf.5 \
-				kaigi.conf.sample kaigi-ldap.conf.sample instance-README
+				kaigi.conf.sample kaigi-ldap.conf.sample \
+				instance-README
 _CORRESPONDING_SOURCE_DIR=	${WRKDIR}/corresponding-source
 _CORRESPONDING_USR_DIR=		${_CORRESPONDING_SOURCE_DIR}/usr
 _CORRESPONDING_USR_PORTS_DIR=	${_CORRESPONDING_USR_DIR}/ports
