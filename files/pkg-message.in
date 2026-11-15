@@ -26,7 +26,7 @@ See the NAMED INSTANCES section of kaigi(8) before enabling this mode.
 See kaigi(8), kaigi.conf(5), kaigi-ldap.conf(5), and
 %%DOCSDIR%%/BASELINE.md for the pending release validation gates.
 The fail2ban filter and PF/IPFW setup instructions are in
-%%PREFIX%%/share/kaigi/fail2ban/ (kaigi.conf and README.md).
+%%PREFIX%%/share/kaigi/fail2ban/ (kaigi.conf and README.txt).
 
 Before public deployment, run make corresponding-source and publish the
 result at %%KAIGI_SOURCE_URL%%. This target collects the application and
