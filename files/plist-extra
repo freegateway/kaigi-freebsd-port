@@ -13,7 +13,7 @@ etc/kaigi/instances/example/ldap/group-meetings.json.sample
 share/man/man8/kaigi.8.gz
 share/man/man5/kaigi.conf.5.gz
 share/man/man5/kaigi-ldap.conf.5.gz
-%%DOCSDIR%%/README.txt
+%%DOCSDIR%%/README.md
 %%DOCSDIR%%/HARDENING.md
 %%DOCSDIR%%/BASELINE.md
 %%DOCSDIR%%/UPSTREAM.md
