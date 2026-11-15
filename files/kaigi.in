@@ -17,7 +17,7 @@ rcvar="kaigi_enable"
 load_rc_config "$name"
 
 : ${kaigi_enable:="NO"}
-: ${kaigi_instances:="default"}
+: ${kaigi_instances:=""}
 : ${kaigi_daemon_user:="www"}
 : ${kaigi_daemon_group:="www"}
 : ${kaigi_start_timeout:="30"}
@@ -54,7 +54,6 @@ if [ "${kaigi_shutdown}" = YES ]; then
 			kaigi_dir="${kaigi_file%/kaigi.pid}"
 			kaigi_running="${kaigi_running} ${kaigi_dir##*/}"
 		done
-		[ ! -f /var/run/kaigi/kaigi.pid ] || kaigi_running="${kaigi_running} default"
 		set -f
 		kaigi_valid=""
 		for kaigi_instance in ${kaigi_instances} ${kaigi_running}; do
@@ -96,6 +95,14 @@ if [ -n "${2:-}" ]; then
 	esac
 fi
 set +f
+case "${kaigi_operation}" in
+	start|restart)
+		if [ -z "${kaigi_seen# }" ]; then
+			echo 'kaigi: set kaigi_instances to at least one explicit instance name'
+			exit 1
+		fi
+		;;
+esac
 
 kaigi_directory()
 {
@@ -119,14 +126,8 @@ kaigi_precmd()
 	kaigi_directory "${kaigi_run_dir}" 0755 root wheel || return 1
 	kaigi_directory "${kaigi_log_dir}" 0755 root wheel || return 1
 	"%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" save-plan /var/run/kaigi/preflight.json "${KAIGI_INSTANCE}" "${kaigi_run_dir}/launch-plan.json" || return 1
-	if [ "${KAIGI_INSTANCE}" != "default" ]; then
-		if [ ! -f "%%WWWDIR%%/app/src/InstancePaths.js" ]; then
-			echo "${name}: installed Kaigi does not support named instances"
-			return 1
-		fi
-		kaigi_directory /var/db/kaigi 0755 root wheel || return 1
-		kaigi_directory "${KAIGI_STATE_DIR}" 0700 "${kaigi_run_user}" "${kaigi_run_group}" || return 1
-	fi
+	kaigi_directory /var/db/kaigi 0755 root wheel || return 1
+	kaigi_directory "${KAIGI_STATE_DIR}" 0700 "${kaigi_run_user}" "${kaigi_run_group}" || return 1
 
 	for kaigi_file in kaigi.conf users; do
 		if [ ! -f "${KAIGI_CONFIG_DIR}/${kaigi_file}" ] || [ ! -r "${KAIGI_CONFIG_DIR}/${kaigi_file}" ]; then
@@ -169,15 +170,13 @@ kaigi_precmd()
 		fi
 	done
 	# Rotation signals this instance's supervisor, not Node or syslogd.
-	if [ "${KAIGI_INSTANCE}" != "default" ]; then
-		kaigi_directory /var/run/kaigi/newsyslog 0755 root wheel || return 1
-		kaigi_rotation="/var/run/kaigi/newsyslog/${KAIGI_INSTANCE}.conf"
-		if [ -L "${kaigi_rotation}" ]; then
-			echo "${name}: rotation entry must not be a symlink"
-			return 1
-		fi
-		(umask 022; printf '%s\t640\t7\t1000\t*\tJC\t%s\n' "${kaigi_log_dir}/kaigi.log" "${kaigi_supervisor_pidfile}" > "${kaigi_rotation}") || return 1
+	kaigi_directory /var/run/kaigi/newsyslog 0755 root wheel || return 1
+	kaigi_rotation="/var/run/kaigi/newsyslog/${KAIGI_INSTANCE}.conf"
+	if [ -L "${kaigi_rotation}" ]; then
+		echo "${name}: rotation entry must not be a symlink"
+		return 1
 	fi
+	(umask 022; printf '%s\t640\t7\t1000\t*\tJC\t%s\n' "${kaigi_log_dir}/kaigi.log" "${kaigi_supervisor_pidfile}" > "${kaigi_rotation}") || return 1
 	cd "%%WWWDIR%%" || return 1
 }
 
@@ -221,22 +220,14 @@ kaigi_run_instance()
 	KAIGI_INSTANCE="$1"
 	kaigi_run_user="${kaigi_daemon_user}"
 	kaigi_run_group="${kaigi_daemon_group}"
-	unset KAIGI_STATE_DIR
-	if [ "${KAIGI_INSTANCE}" = "default" ]; then
-		name="kaigi"
-		KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi"
-		kaigi_run_dir="/var/run/kaigi"
-		kaigi_log_dir="/var/log/kaigi"
-	else
-		name="kaigi_${KAIGI_INSTANCE}"
-		KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi/instances/${KAIGI_INSTANCE}"
-		KAIGI_STATE_DIR="/var/db/kaigi/${KAIGI_INSTANCE}"
-		kaigi_run_dir="/var/run/kaigi/${KAIGI_INSTANCE}"
-		kaigi_log_dir="/var/log/kaigi/${KAIGI_INSTANCE}"
-		eval "kaigi_run_user=\${kaigi_${KAIGI_INSTANCE}_daemon_user:-\$kaigi_run_user}"
-		eval "kaigi_run_group=\${kaigi_${KAIGI_INSTANCE}_daemon_group:-\$kaigi_run_group}"
-		export KAIGI_STATE_DIR
-	fi
+	name="kaigi_${KAIGI_INSTANCE}"
+	KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi/instances/${KAIGI_INSTANCE}"
+	KAIGI_STATE_DIR="/var/db/kaigi/${KAIGI_INSTANCE}"
+	kaigi_run_dir="/var/run/kaigi/${KAIGI_INSTANCE}"
+	kaigi_log_dir="/var/log/kaigi/${KAIGI_INSTANCE}"
+	eval "kaigi_run_user=\${kaigi_${KAIGI_INSTANCE}_daemon_user:-\$kaigi_run_user}"
+	eval "kaigi_run_group=\${kaigi_${KAIGI_INSTANCE}_daemon_group:-\$kaigi_run_group}"
+	export KAIGI_STATE_DIR
 	rcvar="kaigi_enable"
 	pidfile="${kaigi_run_dir}/kaigi.pid"
 	kaigi_supervisor_pidfile="${kaigi_run_dir}/daemon.pid"
@@ -312,10 +303,8 @@ case "${kaigi_operation}" in
 		for kaigi_instance in ${kaigi_instances}; do
 			kaigi_user="${kaigi_daemon_user}"
 			kaigi_group="${kaigi_daemon_group}"
-			if [ "${kaigi_instance}" != default ]; then
-				eval "kaigi_user=\${kaigi_${kaigi_instance}_daemon_user:-\$kaigi_user}"
-				eval "kaigi_group=\${kaigi_${kaigi_instance}_daemon_group:-\$kaigi_group}"
-			fi
+			eval "kaigi_user=\${kaigi_${kaigi_instance}_daemon_user:-\$kaigi_user}"
+			eval "kaigi_group=\${kaigi_${kaigi_instance}_daemon_group:-\$kaigi_group}"
 			set -- "$@" "${kaigi_instance}" "${kaigi_user}" "${kaigi_group}"
 		done
 		"%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" preflight "$@" || exit 1

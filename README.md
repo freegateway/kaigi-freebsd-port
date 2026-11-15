@@ -16,19 +16,23 @@ Copy this port into `www/kaigi` in your ports tree or Poudriere overlay, then
 build and test `www/kaigi` using your usual Poudriere configuration. The port
 requires `www/mediasoup` version 3.32.2 or newer and Node.js 24.
 
-The service is `kaigi`; settings live in `/usr/local/etc/kaigi/kaigi.conf`.
+The service is `kaigi`; every instance's settings live under
+`/usr/local/etc/kaigi/instances/NAME/`.
 Configure users, meeting permissions, TLS and media addresses before starting
 it. See the installed `kaigi(8)`, `kaigi.conf(5)` and `kaigi-ldap.conf(5)` manuals.
 
 ## Named instances
 
-Named-instance startup safety requires Kaigi 0.5.13 or newer.
+The uniform named-instance layout requires Kaigi 0.6.0 or newer.
 The service refuses starts on older application code.
 
 Set `kaigi_instances="staff public"` in rc.conf, and provision separate
 `/usr/local/etc/kaigi/instances/staff` and `public` configuration trees.
-Leaving the setting unset retains the original default instance. Use, for
-example, `service kaigi restart staff`; omitting the name acts on the whole list.
+For one instance use `kaigi_instances="staff"`. A missing or empty list rejects
+start/restart; there is no default instance. Package templates and a provisioning
+README live in `instances/example/`; copy to a new named directory, rename and
+configure the required .sample files. Templates are never enabled automatically.
+Use `service kaigi restart staff`; omitting the name acts on the whole list.
 Each instance needs its own web port/public URL and non-overlapping TCP/UDP media
 ranges. Separate service accounts are optional but recommended for isolation.
 Preflight checks the entire configured list before any restart stop phase, under

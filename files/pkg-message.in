@@ -6,10 +6,15 @@ See %%DOCSDIR%%/BASELINE.md for source provenance.
 
 Enable and start the independent Kaigi service:
     sysrc kaigi_enable="YES"
+    sysrc kaigi_instances="staff"
     service kaigi start
 
-Configure %%PREFIX%%/etc/kaigi/kaigi.conf, users, meeting-properties.json
-and site-translations.json before starting. Protect credentials and TLS keys.
+First copy %%PREFIX%%/etc/kaigi/instances/example to a new named directory
+such as %%PREFIX%%/etc/kaigi/instances/staff. Follow its README to rename
+the required .sample files and configure accounts, TLS and network allocations.
+There is no default instance. No example directory is automatically enabled.
+Every instance's configuration belongs under etc/kaigi/instances/NAME.
+Protect credentials and TLS keys.
 LDAP support is included, disabled by default; configure ldap/ldap.conf and
 ldap/group-meetings.json before setting LDAP_ENABLED=true.
 MiroTalk may coexist using its own service and settings.

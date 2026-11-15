@@ -1,2 +1,1 @@
-/var/log/kaigi/kaigi.log	640	7	1000	*	JC	/var/run/kaigi/daemon.pid
 <include> /var/run/kaigi/newsyslog/*.conf

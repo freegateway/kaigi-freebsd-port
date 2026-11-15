@@ -1,14 +1,15 @@
 etc/rc.d/kaigi
-@sample etc/kaigi/kaigi.conf.sample
-@sample etc/kaigi/site-translations.json.sample
-@sample etc/kaigi/meeting-properties.json.sample
-@sample etc/kaigi/site-assets/site.css.sample
-etc/kaigi/site-assets/privacy-private.html.sample
-etc/kaigi/site-assets/privacy-public.html.sample
-@sample(root,wheel,0600) etc/kaigi/users.sample
-@sample etc/kaigi/ldap/ldap.conf.sample
-@sample etc/kaigi/ldap/group-meetings.json.sample
-@dir etc/kaigi/site-assets
+etc/kaigi/instances/example/README
+etc/kaigi/instances/example/kaigi.conf.sample
+etc/kaigi/instances/example/site-translations.json.sample
+etc/kaigi/instances/example/meeting-properties.json.sample
+etc/kaigi/instances/example/site-assets/site.css.sample
+etc/kaigi/instances/example/site-assets/privacy-private.html.sample
+etc/kaigi/instances/example/site-assets/privacy-public.html.sample
+@(root,wheel,0600) etc/kaigi/instances/example/users.sample
+etc/kaigi/instances/example/ldap/ldap.conf.sample
+etc/kaigi/instances/example/ldap/group-meetings.json.sample
+@dir etc/kaigi/instances
 share/man/man8/kaigi.8.gz
 share/man/man5/kaigi.conf.5.gz
 share/man/man5/kaigi-ldap.conf.5.gz

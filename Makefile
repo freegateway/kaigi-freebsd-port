@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.5.13
+DISTVERSION=	0.6.0
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -17,7 +17,7 @@ RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	ddaea25533dc7ffaf2b05bcc5f4e42544df98083
+GH_TAGNAME=	bdefb955d1c05e8e839d1110eebcb5883366d85f
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
@@ -28,7 +28,7 @@ SUB_FILES=	kaigi kaigi.newsyslog.conf pkg-message
 SUB_LIST=	KAIGI_SOURCE_URL=${_KAIGI_SOURCE_URL}
 
 _KAIGI_APP_TEMPLATES=		kaigi.8 kaigi.conf.5 kaigi-ldap.conf.5 \
-				kaigi.conf.sample kaigi-ldap.conf.sample
+				kaigi.conf.sample kaigi-ldap.conf.sample instance-README
 _CORRESPONDING_SOURCE_DIR=	${WRKDIR}/corresponding-source
 _CORRESPONDING_USR_DIR=		${_CORRESPONDING_SOURCE_DIR}/usr
 _CORRESPONDING_USR_PORTS_DIR=	${_CORRESPONDING_USR_DIR}/ports
@@ -84,23 +84,26 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/rc.d
 	${INSTALL_SCRIPT} ${WRKDIR}/kaigi \
 		${STAGEDIR}${PREFIX}/etc/rc.d/kaigi
-	${MKDIR} ${STAGEDIR}${ETCDIR}/site-assets ${STAGEDIR}${ETCDIR}/ldap
+	${MKDIR} ${STAGEDIR}${ETCDIR}/instances/example/site-assets \
+		${STAGEDIR}${ETCDIR}/instances/example/ldap
+	${INSTALL_DATA} ${WRKDIR}/instance-README \
+		${STAGEDIR}${ETCDIR}/instances/example/README
 	${INSTALL_DATA} ${WRKDIR}/kaigi.conf.sample \
-		${STAGEDIR}${ETCDIR}/kaigi.conf.sample
+		${STAGEDIR}${ETCDIR}/instances/example/kaigi.conf.sample
 	${INSTALL_DATA} ${WRKDIR}/kaigi-ldap.conf.sample \
-		${STAGEDIR}${ETCDIR}/ldap/ldap.conf.sample
+		${STAGEDIR}${ETCDIR}/instances/example/ldap/ldap.conf.sample
 .for sample in site-translations.json meeting-properties.json
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/${sample}.sample \
-		${STAGEDIR}${ETCDIR}/${sample}.sample
+		${STAGEDIR}${ETCDIR}/instances/example/${sample}.sample
 .endfor
 .for sample in site.css privacy-private.html privacy-public.html
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/${sample}.sample \
-		${STAGEDIR}${ETCDIR}/site-assets/${sample}.sample
+		${STAGEDIR}${ETCDIR}/instances/example/site-assets/${sample}.sample
 .endfor
 	${INSTALL_DATA} -m 0600 ${WRKSRC}/packaging/freebsd/users.sample \
-		${STAGEDIR}${ETCDIR}/users.sample
+		${STAGEDIR}${ETCDIR}/instances/example/users.sample
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/group-meetings.json.sample \
-		${STAGEDIR}${ETCDIR}/ldap/group-meetings.json.sample
+		${STAGEDIR}${ETCDIR}/instances/example/ldap/group-meetings.json.sample
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/man/man8 \
 		${STAGEDIR}${PREFIX}/share/man/man5
 	${INSTALL_MAN} ${WRKDIR}/kaigi.8 \
