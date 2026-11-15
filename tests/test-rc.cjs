@@ -8,6 +8,16 @@ const path = require('node:path');
 const { spawnSync, spawn } = require('node:child_process');
 const template = fs.readFileSync(path.join(__dirname, '../files/kaigi.in'), 'utf8');
 
+test('installs the Fail2ban filter and README under share/kaigi', () => {
+    const makefile = fs.readFileSync(path.join(__dirname, '../Makefile'), 'utf8');
+    const plist = fs.readFileSync(path.join(__dirname, '../files/plist-extra'), 'utf8');
+    const message = fs.readFileSync(path.join(__dirname, '../files/pkg-message.in'), 'utf8');
+    assert.match(makefile, /\$\{PREFIX\}\/share\/kaigi\/fail2ban\/README.md/);
+    for (const name of ['kaigi.conf', 'README.md']) assert(plist.includes('share/kaigi/fail2ban/' + name));
+    assert(!plist.includes('%%EXAMPLESDIR%%/fail2ban'));
+    assert(message.includes('%%PREFIX%%/share/kaigi/fail2ban/'));
+});
+
 test('configuration packaging contains inactive example templates only', () => {
     const makefile = fs.readFileSync(path.join(__dirname, '../Makefile'), 'utf8');
     const plist = fs.readFileSync(path.join(__dirname, '../files/plist-extra'), 'utf8');

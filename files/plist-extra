@@ -19,5 +19,6 @@ share/man/man5/kaigi-ldap.conf.5.gz
 %%DOCSDIR%%/UPSTREAM.md
 %%DOCSDIR%%/INSTANCES.md
 %%DOCSDIR%%/vendor-files.json
-%%EXAMPLESDIR%%/fail2ban/kaigi.conf
+share/kaigi/fail2ban/kaigi.conf
+share/kaigi/fail2ban/README.md
 etc/newsyslog.conf.d/kaigi.conf

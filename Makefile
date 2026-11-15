@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.6.2
+DISTVERSION=	0.6.3
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -17,7 +17,7 @@ RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	008e48ee3aa73002c5dcf5a17abc07df40e73a7b
+GH_TAGNAME=	b7b6f53e4eac73e9a2fe123cd37e955130b3bd78
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
@@ -120,9 +120,11 @@ do-install:
 .for doc in BASELINE.md UPSTREAM.md INSTANCES.md vendor-files.json
 	${INSTALL_DATA} ${WRKSRC}/docs/${doc} ${STAGEDIR}${DOCSDIR}/${doc}
 .endfor
-	${MKDIR} ${STAGEDIR}${EXAMPLESDIR}/fail2ban
+	${MKDIR} ${STAGEDIR}${PREFIX}/share/kaigi/fail2ban
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/kaigi.conf \
-		${STAGEDIR}${EXAMPLESDIR}/fail2ban/kaigi.conf
+		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/kaigi.conf
+	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/README.md \
+		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/README.md
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/newsyslog.conf.d
 	${INSTALL_DATA} ${WRKDIR}/kaigi.newsyslog.conf \
 		${STAGEDIR}${PREFIX}/etc/newsyslog.conf.d/kaigi.conf
