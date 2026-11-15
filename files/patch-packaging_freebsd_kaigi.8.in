@@ -1,0 +1,14 @@
+Fix a literal .sample at the start of a roff input line.
+
+--- packaging/freebsd/kaigi.8.in.orig
++++ packaging/freebsd/kaigi.8.in
+@@ -61,7 +61,8 @@
+ .Pa %%PREFIX%%/etc/kaigi/instances/example .
+ No template is enabled automatically and no active configuration, account or JWT
+ secret is installed. Copy the example to a new named directory, rename required
+-.sample files and configure the deployment before starting. Package upgrades
++.Pa .sample
++files and configure the deployment before starting. Package upgrades
+ update only the examples, not administrator-created instance files.
+ .Pp
+ For example, configure two independent instances in
