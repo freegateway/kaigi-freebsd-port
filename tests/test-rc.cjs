@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const { spawnSync, spawn } = require('node:child_process');
 const template = fs.readFileSync(path.join(__dirname, '../files/kaigi.in'), 'utf8');
 
 function fixture(native = false) {
@@ -14,10 +14,47 @@ function fixture(native = false) {
     const application = path.join(root, 'application');
     fs.mkdirSync(path.join(application, 'app/src'), { recursive: true });
     fs.writeFileSync(path.join(application, 'app/src/InstancePaths.js'), '// fixture capability marker\n');
+    // Isolate shell orchestration tests from application parsing. The application
+    // suite tests the real preflight separately; the native test uses real rc/daemon.
+    fs.writeFileSync(path.join(application, 'app/src/StartupSafety.js'), `
+        const fs = require('node:fs'), path = require('node:path');
+        const root = ${JSON.stringify(root)}, args = process.argv.slice(2);
+        if (args[0] === 'preflight') {
+            fs.appendFileSync(path.join(root, 'events'), 'preflight-begin\\n');
+            if (fs.existsSync(path.join(root, 'delay'))) require('node:child_process').spawnSync('/bin/sleep', ['0.2']);
+            for (let i = 6; i < args.length; i += 3) {
+                const config = args[i] === 'default' ? args[1] : path.join(args[1], 'instances', args[i]);
+                for (const name of ['users','kaigi.conf']) if (!fs.existsSync(path.join(config,name))) process.exit(1);
+            }
+            if (fs.existsSync(path.join(root, 'preflight-fail'))) process.exit(1);
+            fs.appendFileSync(path.join(root, 'events'), 'preflight-end\\n');
+        } else if (args[0] === 'save-plan') fs.writeFileSync(args[3], '{}');
+        else if (args[0] === 'identity' && fs.existsSync(path.join(root, 'stale-identity'))) process.exit(1);
+        else if (args[0] === 'ready' || args[0] === 'wait') {
+            if (fs.existsSync(path.join(root, 'readiness-fail'))) process.exit(1);
+            if (${native}) {
+                const deadline = Date.now() + 10000;
+                let ready = false;
+                while (Date.now() < deadline) {
+                    try {
+                        const data = JSON.parse(fs.readFileSync(args[1]));
+                        ready = data.pid === Number(fs.readFileSync(args[2])) && data.nonce === args[3];
+                        if (ready) break;
+                    } catch {}
+                    require('node:child_process').spawnSync('/bin/sleep', ['0.05']);
+                }
+                if (!ready) process.exit(1);
+            }
+        }
+    `);
     fs.writeFileSync(path.join(application, 'app/src/Server.js'), `
         const http = require('node:http');
         const server = http.createServer((q, r) => r.end(process.env.KAIGI_INSTANCE));
-        server.listen(0, '127.0.0.1', () => console.log('port=' + server.address().port));
+        server.listen(0, '127.0.0.1', () => {
+            console.log('port=' + server.address().port);
+            if (process.env.KAIGI_READY_FILE) require('node:fs').writeFileSync(process.env.KAIGI_READY_FILE,
+                JSON.stringify({pid:process.pid,nonce:process.env.KAIGI_STARTUP_NONCE}));
+        });
         process.on('SIGTERM', () => server.close(() => process.exit(0)));
     `);
     for (const instance of ['default', 'staff', 'public']) {
@@ -28,15 +65,22 @@ function fixture(native = false) {
     }
     const stub = path.join(root, 'rc.subr');
     fs.writeFileSync(stub, `
-        load_rc_config() { . "$TEST_RC_CONF"; }
+        load_rc_config() { . "${root}/rc.conf"; }
+        checkyesno() { [ "$kaigi_enable" = YES ]; }
+        check_pidfile() { return 1; }
+        chown() { return 0; }
         install() {
             for argument do directory="$argument"; done
             mkdir -p "$directory"
         }
         run_rc_command() {
             if [ "$1" = start ] && [ "$kaigi_enable" != YES ]; then return 1; fi
-            case "$1" in start|onestart) kaigi_precmd || return 1 ;; esac
-            printf '%s|%s|%s|%s|%s|%s|%s|%s|%s\\n' "$1" "$name" "$pidfile" "$KAIGI_CONFIG_DIR" "$KAIGI_STATE_DIR" "$kaigi_run_user" "$kaigi_run_group" "$HOST_USERS" "$command_args" >> "$TEST_CAPTURE"
+            operation="$1"
+            case "$operation" in one*) operation=\${operation#one} ;; force*) operation=\${operation#force} ;; quiet*) operation=\${operation#quiet} ;; fast*) operation=\${operation#fast} ;; esac
+            case "$operation" in stop) printf 'stop\\n' >> "${root}/events" ;; esac
+            case "$operation" in start|restart) eval "$start_precmd" || return 1 ;; esac
+            printf '%s|%s|%s|%s|%s|%s|%s|%s|%s\\n' "$1" "$name" "$pidfile" "$KAIGI_CONFIG_DIR" "$KAIGI_STATE_DIR" "$kaigi_run_user" "$kaigi_run_group" "$HOST_USERS" "$command_args" >> "${root}/capture"
+            case "$operation" in start|restart) kaigi_started || { case "$1" in force*) return 0 ;; *) return 1 ;; esac; } ;; esac
         }
     `);
     const script = path.join(root, 'kaigi');
@@ -46,8 +90,9 @@ function fixture(native = false) {
         .replaceAll('/var/run/kaigi', path.join(root, 'run'))
         .replaceAll('/var/log/kaigi', path.join(root, 'log'))
         .replaceAll('/var/db/kaigi', path.join(root, 'state'));
-    if (native) content = content.replace('load_rc_config "$name"', '. "$TEST_RC_CONF"');
+    if (native) content = content.replace('load_rc_config "$name"', `. "${root}/rc.conf"`);
     else content = content.replace('. /etc/rc.subr', `. "${stub}"`);
+    if (!native) content = content.replace('/usr/bin/lockf -k -t 30', '/usr/bin/flock -w 30');
     fs.writeFileSync(script, content);
     const capture = path.join(root, 'capture');
     const rcconf = path.join(root, 'rc.conf');
@@ -58,7 +103,7 @@ function fixture(native = false) {
             env: { PATH: process.env.PATH, TEST_RC_CONF: rcconf, TEST_CAPTURE: capture },
         });
     }
-    return { root, config, application, run, capture, cleanup() { fs.rmSync(root, { recursive: true, force: true }); } };
+    return { root, config, application, run, capture, script, rcconf, cleanup() { fs.rmSync(root, { recursive: true, force: true }); } };
 }
 
 test('POSIX shell syntax', () => {
@@ -86,7 +131,7 @@ test('default paths, dispatch, independent credentials and stable secrets', () =
         assert.equal(fs.statSync(path.join(f.config, 'instances/staff/jwt-secret')).mode & 0o777, 0o600);
         for (const action of ['stop', 'restart', 'status', 'onestart', 'rcvar']) {
             assert.equal(f.run(settings, [action, 'staff']).status, 0);
-            assert(fs.readFileSync(f.capture, 'utf8').trim().split('\n').at(-1).startsWith(`${action}|kaigi_staff|`));
+            assert(fs.readFileSync(f.capture, 'utf8').trim().split('\n').at(-1).startsWith(`${action === 'restart' ? 'start' : action}|kaigi_staff|`));
         }
         const rotation = fs.readFileSync(path.join(f.root, 'run/newsyslog/staff.conf'), 'utf8');
         assert(rotation.includes(`${f.root}/log/staff/kaigi.log`));
@@ -100,10 +145,10 @@ test('rejects invalid, duplicate, unknown and compound selectors before dispatch
     const f = fixture();
     try {
         for (const names of ['staff ../public', 'staff staff', 'Staff', '*', 'a'.repeat(33)]) {
-            assert.notEqual(f.run(`kaigi_instances="${names}"\n`, ['status']).status, 0);
+            assert.notEqual(f.run(`kaigi_instances="${names}"\n`, ['start']).status, 0);
             assert(!fs.existsSync(f.capture));
         }
-        for (const name of ['unknown', 'staff public', '../staff']) {
+        for (const name of ['staff public', '../staff']) {
             assert.notEqual(f.run('kaigi_instances="staff public"\n', ['status', name]).status, 0);
             assert(!fs.existsSync(f.capture));
         }
@@ -120,14 +165,15 @@ test('disabled services do not start normally; onestart explicitly bypasses enab
     } finally { f.cleanup(); }
 });
 
-test('missing configuration fails that instance but continues others; status needs no credentials', () => {
+test('missing configuration fails the entire preflight; status needs no credentials', () => {
     const f = fixture();
     try {
         const settings = 'kaigi_enable="YES"\nkaigi_instances="staff public"\n';
         fs.unlinkSync(path.join(f.config, 'instances/staff/users'));
         assert.equal(f.run(settings, ['start']).status, 1);
-        assert.match(fs.readFileSync(f.capture, 'utf8'), /^start\|kaigi_public\|/);
+        assert(!fs.existsSync(f.capture));
         assert.equal(f.run(settings, ['status', 'staff']).status, 0);
+        fs.mkdirSync(path.join(f.root, 'run/staff'), { recursive: true });
         fs.symlinkSync(path.join(f.root, 'capture'), path.join(f.root, 'run/staff/kaigi.pid'));
         assert.equal(f.run(settings, ['stop', 'staff']).status, 1);
     } finally { f.cleanup(); }
@@ -145,6 +191,60 @@ test('does not overwrite a symlinked secret or start named instances on an old a
         fs.unlinkSync(path.join(f.config, 'instances/staff/jwt-secret'));
         fs.unlinkSync(path.join(f.application, 'app/src/InstancePaths.js'));
         assert.equal(f.run(settings, ['start']).status, 1);
+    } finally { f.cleanup(); }
+});
+
+test('failed restart preflight leaves running processes untouched and never dispatches stop', () => {
+    const f = fixture();
+    try {
+        fs.writeFileSync(path.join(f.root, 'preflight-fail'), 'fixture');
+        const result = f.run('kaigi_enable="YES"\nkaigi_instances="staff public"\n', ['restart', 'staff']);
+        assert.equal(result.status, 1);
+        assert(!fs.existsSync(f.capture));
+        assert.equal(fs.readFileSync(path.join(f.root, 'events'), 'utf8'), 'preflight-begin\n');
+    } finally { f.cleanup(); }
+});
+
+test('readiness failure returns nonzero within the configured deadline', () => {
+    const f = fixture();
+    try {
+        fs.writeFileSync(path.join(f.root, 'readiness-fail'), 'fixture');
+        const before = Date.now();
+        for (const action of ['start', 'restart', 'onestart', 'onerestart', 'forcestart', 'forcerestart', 'quietstart', 'quietrestart', 'faststart', 'fastrestart']) {
+            const result = f.run('kaigi_enable="YES"\nkaigi_instances="staff"\nkaigi_start_timeout=1\n', [action]);
+            assert.equal(result.status, 1, action);
+            assert.match(result.stdout, /did not become ready/);
+        }
+        assert(Date.now() - before < 5000);
+    } finally { f.cleanup(); }
+});
+
+test('stop and status accept removed names and survive a malformed configured list', () => {
+    const f = fixture();
+    try {
+        assert.equal(f.run('kaigi_instances="../invalid"\n', ['stop', 'staff']).status, 0);
+        assert.equal(f.run('kaigi_instances="../invalid"\n', ['status', 'staff']).status, 0);
+        fs.mkdirSync(path.join(f.root, 'run/staff'), { recursive: true });
+        fs.writeFileSync(path.join(f.root, 'run/staff/kaigi.pid'), String(process.pid));
+        assert.equal(f.run('kaigi_instances="../invalid"\n', ['stop']).status, 0);
+        assert.match(fs.readFileSync(f.capture, 'utf8'), /stop\|kaigi_staff\|/);
+        fs.writeFileSync(path.join(f.root, 'stale-identity'), 'fixture');
+        assert.equal(f.run('kaigi_instances="public"\n', ['stop', 'staff']).status, 1);
+    } finally { f.cleanup(); }
+});
+
+test('concurrent service invocations cannot interleave preflight and restart (flock substitute on Linux)', async () => {
+    const f = fixture();
+    try {
+        fs.writeFileSync(f.rcconf, 'kaigi_enable="YES"\nkaigi_instances="staff"\n');
+        fs.writeFileSync(path.join(f.root, 'delay'), 'fixture');
+        const invoke = () => new Promise((resolve, reject) => {
+            const child = spawn('/bin/sh', [f.script, 'restart', 'staff'], { stdio: 'ignore' });
+            child.on('error', reject); child.on('exit', code => resolve(code));
+        });
+        assert.deepEqual(await Promise.all([invoke(), invoke()]), [0, 0]);
+        assert.equal(fs.readFileSync(path.join(f.root, 'events'), 'utf8'),
+            'preflight-begin\npreflight-end\nstop\npreflight-begin\npreflight-end\nstop\n');
     } finally { f.cleanup(); }
 });
 
