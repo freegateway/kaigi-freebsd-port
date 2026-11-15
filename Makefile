@@ -120,9 +120,11 @@ do-install:
 .for doc in BASELINE.md UPSTREAM.md INSTANCES.md vendor-files.json
 	${INSTALL_DATA} ${WRKSRC}/docs/${doc} ${STAGEDIR}${DOCSDIR}/${doc}
 .endfor
-	${MKDIR} ${STAGEDIR}${EXAMPLESDIR}/fail2ban
+	${MKDIR} ${STAGEDIR}${PREFIX}/share/kaigi/fail2ban
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/kaigi.conf \
-		${STAGEDIR}${EXAMPLESDIR}/fail2ban/kaigi.conf
+		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/kaigi.conf
+	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/fail2ban/README.md \
+		${STAGEDIR}${PREFIX}/share/kaigi/fail2ban/README.md
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/newsyslog.conf.d
 	${INSTALL_DATA} ${WRKDIR}/kaigi.newsyslog.conf \
 		${STAGEDIR}${PREFIX}/etc/newsyslog.conf.d/kaigi.conf

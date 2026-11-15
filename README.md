@@ -9,6 +9,8 @@ source and dependency hashes, locked npm extraction rules, package messages,
 service script, log rotation configuration and supplementary packing list.
 Application code, configuration examples, administrator manuals and the
 application-specific fail2ban filter belong to the Kaigi repository.
+The filter and PF/IPFW setup README install under
+`/usr/local/share/kaigi/fail2ban/`; enabling blocking remains an administrator task.
 
 ## Installation and testing
 
