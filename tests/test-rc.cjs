@@ -8,6 +8,25 @@ const path = require('node:path');
 const { spawnSync, spawn } = require('node:child_process');
 const template = fs.readFileSync(path.join(__dirname, '../files/kaigi.in'), 'utf8');
 
+function platformLock(content, platform = process.platform) {
+    return platform === 'linux' ? content.replace('/usr/bin/lockf -k -t 30', '/usr/bin/flock -w 30') : content;
+}
+
+test('uses native lockf on FreeBSD and substitutes flock only on Linux', () => {
+    const command = '/usr/bin/lockf -k -t 30';
+    assert.equal(platformLock(command, 'freebsd'), command);
+    assert.equal(platformLock(command, 'linux'), '/usr/bin/flock -w 30');
+    assert.equal(platformLock(command, 'darwin'), command);
+});
+
+test('main README packing entry matches the installed Markdown filename', () => {
+    const makefile = fs.readFileSync(path.join(__dirname, '../Makefile'), 'utf8');
+    const plist = fs.readFileSync(path.join(__dirname, '../files/plist-extra'), 'utf8');
+    assert.match(makefile, /\.for doc in README\.md HARDENING\.md/);
+    assert(plist.split('\n').includes('%%DOCSDIR%%/README.md'));
+    assert(!plist.split('\n').includes('%%DOCSDIR%%/README.txt'));
+});
+
 test('installs the Fail2ban filter and README under share/kaigi', () => {
     const makefile = fs.readFileSync(path.join(__dirname, '../Makefile'), 'utf8');
     const plist = fs.readFileSync(path.join(__dirname, '../files/plist-extra'), 'utf8');
@@ -120,7 +139,7 @@ function fixture(native = false) {
         .replaceAll('/var/db/kaigi', path.join(root, 'state'));
     if (native) content = content.replace('load_rc_config "$name"', `. "${root}/rc.conf"`);
     else content = content.replace('. /etc/rc.subr', `. "${stub}"`);
-    if (!native) content = content.replace('/usr/bin/lockf -k -t 30', '/usr/bin/flock -w 30');
+    if (!native) content = platformLock(content);
     fs.writeFileSync(script, content);
     const capture = path.join(root, 'capture');
     const rcconf = path.join(root, 'rc.conf');

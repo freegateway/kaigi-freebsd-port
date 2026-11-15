@@ -46,6 +46,10 @@ Run `node --test tests/test-rc.cjs` to check dispatch and preflight behavior.
 The native rc.subr/daemon lifecycle and log-reopening test runs only as root on
 FreeBSD, in temporary directories with loopback-only fixture servers.
 
+These are repository maintenance tests, not package files or build requirements.
+Git archives exclude `tests/` through `.gitattributes`; retain that exclusion when
+preparing deployment archives or the port for submission to FreeBSD.
+
 ## Source and dependencies
 
 `GH_TAGNAME` selects an exact Kaigi commit. `distinfo` records the checksums and
