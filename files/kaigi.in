@@ -4,6 +4,12 @@
 # REQUIRE: LOGIN NETWORKING
 # KEYWORD: shutdown
 
+kaigi_locked=NO
+if [ "${1:-}" = --locked ]; then
+	kaigi_locked=YES
+	shift
+fi
+
 . /etc/rc.subr
 
 name="kaigi"
@@ -14,8 +20,18 @@ load_rc_config "$name"
 : ${kaigi_instances:="default"}
 : ${kaigi_daemon_user:="www"}
 : ${kaigi_daemon_group:="www"}
+: ${kaigi_start_timeout:="30"}
+: ${NODE_ENV:="production"}
+export NODE_ENV
 
 kaigi_action="${1:-}"
+kaigi_operation="${kaigi_action}"
+case "${kaigi_operation}" in
+	one*) kaigi_operation="${kaigi_operation#one}" ;;
+	force*) kaigi_operation="${kaigi_operation#force}" ;;
+	fast*) kaigi_operation="${kaigi_operation#fast}" ;;
+	quiet*) kaigi_operation="${kaigi_operation#quiet}" ;;
+esac
 if [ "$#" -gt 2 ]; then
 	echo "Usage: $0 action [instance]"
 	exit 1
@@ -23,6 +39,33 @@ fi
 
 # Validate the entire list before operating. Never expand malformed globs.
 set -f
+kaigi_shutdown=NO
+case "${kaigi_operation}" in stop|status) kaigi_shutdown=YES ;; esac
+if [ "${kaigi_shutdown}" = YES ]; then
+	# An explicit stop/status remains available after removal from rc.conf.
+	if [ -n "${2:-}" ]; then
+		kaigi_instances="$2"
+	else
+		# Include running instances even after the configured list changes.
+		set +f
+		kaigi_running=""
+		for kaigi_file in /var/run/kaigi/*/kaigi.pid; do
+			[ -f "${kaigi_file}" ] || continue
+			kaigi_dir="${kaigi_file%/kaigi.pid}"
+			kaigi_running="${kaigi_running} ${kaigi_dir##*/}"
+		done
+		[ ! -f /var/run/kaigi/kaigi.pid ] || kaigi_running="${kaigi_running} default"
+		set -f
+		kaigi_valid=""
+		for kaigi_instance in ${kaigi_instances} ${kaigi_running}; do
+			case "${kaigi_instance}" in *[!a-z0-9_]*|[!a-z]*) continue ;; esac
+			[ "${#kaigi_instance}" -le 32 ] || continue
+			case " ${kaigi_valid} " in *" ${kaigi_instance} "*) continue ;; esac
+			kaigi_valid="${kaigi_valid} ${kaigi_instance}"
+		done
+		kaigi_instances="${kaigi_valid}"
+	fi
+fi
 kaigi_seen=" "
 for kaigi_instance in ${kaigi_instances}; do
 	case "${kaigi_instance}" in
@@ -65,11 +108,17 @@ kaigi_directory()
 
 kaigi_precmd()
 {
+	# fast/force must not bypass instance identity or replace a live snapshot.
+	if [ -n "$(check_pidfile "${pidfile}" "%%LOCALBASE%%/bin/node")" ]; then
+		echo "${name}: already running; use restart"
+		return 1
+	fi
 	# Root controls PID directories; service accounts cannot replace PID files.
 	kaigi_directory /var/run/kaigi 0755 root wheel || return 1
 	kaigi_directory /var/log/kaigi 0755 root wheel || return 1
 	kaigi_directory "${kaigi_run_dir}" 0755 root wheel || return 1
 	kaigi_directory "${kaigi_log_dir}" 0755 root wheel || return 1
+	"%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" save-plan /var/run/kaigi/preflight.json "${KAIGI_INSTANCE}" "${kaigi_run_dir}/launch-plan.json" || return 1
 	if [ "${KAIGI_INSTANCE}" != "default" ]; then
 		if [ ! -f "%%WWWDIR%%/app/src/InstancePaths.js" ]; then
 			echo "${name}: installed Kaigi does not support named instances"
@@ -106,6 +155,12 @@ kaigi_precmd()
 	fi
 	HOST_USERS="$(cat "${KAIGI_CONFIG_DIR}/users")" || return 1
 	export JWT_SECRET HOST_USERS
+	kaigi_ready_dir=$(mktemp -d "${kaigi_run_dir}/startup.XXXXXX") || return 1
+	chown "${kaigi_run_user}:${kaigi_run_group}" "${kaigi_ready_dir}" || return 1
+	KAIGI_READY_FILE="${kaigi_ready_dir}/ready.json"
+	KAIGI_STARTUP_NONCE=$(/usr/bin/openssl rand -hex 16) || return 1
+	KAIGI_SERVICE=1
+	export KAIGI_READY_FILE KAIGI_STARTUP_NONCE KAIGI_SERVICE
 
 	for kaigi_file in "${pidfile}" "${kaigi_supervisor_pidfile}" "${kaigi_log_dir}/kaigi.log"; do
 		if [ -L "${kaigi_file}" ]; then
@@ -124,6 +179,41 @@ kaigi_precmd()
 		(umask 022; printf '%s\t640\t7\t1000\t*\tJC\t%s\n' "${kaigi_log_dir}/kaigi.log" "${kaigi_supervisor_pidfile}" > "${kaigi_rotation}") || return 1
 	fi
 	cd "%%WWWDIR%%" || return 1
+}
+
+kaigi_guarded_precmd()
+{
+	# rc.subr's force prefix can ignore a hook's failure. Exit this instance's
+	# subshell instead: startup safety is never a force-overridable warning.
+	kaigi_precmd || exit 1
+}
+
+kaigi_started()
+{
+	if "%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" wait "${KAIGI_READY_FILE}" "${pidfile}" "${KAIGI_STARTUP_NONCE}" "${kaigi_start_timeout}"; then
+		rm -f "${KAIGI_READY_FILE}"
+		rmdir "${kaigi_ready_dir}"
+		return 0
+	fi
+	echo "${name}: startup did not become ready within ${kaigi_start_timeout} seconds"
+	kaigi_start_failed=YES
+	# Signal only this instance's validated supervisor; it forwards SIGTERM.
+	kaigi_supervisor=$(check_pidfile "${kaigi_supervisor_pidfile}" /usr/sbin/daemon)
+	[ -z "${kaigi_supervisor}" ] || kill -TERM "${kaigi_supervisor}"
+	kaigi_cleanup_wait=0
+	while [ "${kaigi_cleanup_wait}" -lt 5 ] && [ -n "$(check_pidfile "${kaigi_supervisor_pidfile}" /usr/sbin/daemon)" ]; do
+		sleep 1
+		kaigi_cleanup_wait=$((kaigi_cleanup_wait + 1))
+	done
+	kaigi_supervisor=$(check_pidfile "${kaigi_supervisor_pidfile}" /usr/sbin/daemon)
+	if [ -n "${kaigi_supervisor}" ]; then
+		kaigi_child=$(check_pidfile "${pidfile}" "%%LOCALBASE%%/bin/node")
+		[ -z "${kaigi_child}" ] || kill -KILL "${kaigi_child}"
+		kill -KILL "${kaigi_supervisor}"
+	fi
+	rm -f "${KAIGI_READY_FILE}"
+	rmdir "${kaigi_ready_dir}" 2>/dev/null || :
+	return 1
 }
 
 kaigi_run_instance()
@@ -158,19 +248,86 @@ kaigi_run_instance()
 		fi
 	done
 	procname="%%LOCALBASE%%/bin/node"
+	if { [ "${kaigi_shutdown}" = YES ] || [ "${kaigi_operation}" = restart ]; } && [ -f "${pidfile}" ] && [ -f "%%WWWDIR%%/app/src/StartupSafety.js" ]; then
+		if ! "%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" identity "${pidfile}"; then
+			echo "${name}: stale process identity; refusing to signal it"
+			exit 1
+		fi
+	fi
 	command="/usr/sbin/daemon"
 	command_args="-f -H -p ${pidfile} -P ${kaigi_supervisor_pidfile} -u ${kaigi_run_user} -o ${kaigi_log_dir}/kaigi.log %%LOCALBASE%%/bin/node app/src/Server.js"
 	KAIGI_SOURCE_URL="%%KAIGI_SOURCE_URL%%"
 	export KAIGI_INSTANCE KAIGI_CONFIG_DIR KAIGI_SOURCE_URL
-	start_precmd="kaigi_precmd"
+	start_precmd="kaigi_guarded_precmd"
+	start_postcmd="kaigi_started"
+	kaigi_start_failed=NO
+	if [ "${kaigi_operation}" = restart ]; then
+		# Keep readiness failure observable even for force/one restart. rc.subr
+		# otherwise performs stop/start in subshells and may override status.
+		kaigi_prefix="${kaigi_action%restart}"
+		if ! (run_rc_command "${kaigi_prefix}stop"); then
+			[ -z "$(check_pidfile "${pidfile}" "${procname}")" ] || exit 1
+		fi
+		(run_rc_command "${kaigi_prefix}start"; kaigi_status=$?; [ "${kaigi_start_failed}" != YES ] || exit 1; exit "${kaigi_status}")
+		exit $?
+	fi
 	run_rc_command "${kaigi_action}"
+	kaigi_status=$?
+	[ "${kaigi_start_failed}" != YES ] || exit 1
+	exit "${kaigi_status}"
 )
+
+# Serialize lifecycle operations. Re-enter under lock with a clean caller
+# environment; rc.conf is loaded again inside the lock. No credentials in argv.
+case "${kaigi_operation}" in
+	start|restart|stop)
+		if [ "${kaigi_locked}" != YES ]; then
+			kaigi_directory /var/run/kaigi 0755 root wheel || exit 1
+			if [ -L /var/run/kaigi/service.lock ]; then
+				echo 'kaigi: service lock must not be a symlink'
+				exit 1
+			fi
+			exec /usr/bin/env -i PATH=/sbin:/bin:/usr/sbin:/usr/bin:%%LOCALBASE%%/bin /usr/bin/lockf -k -t 30 /var/run/kaigi/service.lock /bin/sh "$0" --locked "${kaigi_action}" "${2:-}"
+		fi
+		;;
+esac
+
+case "${kaigi_operation}" in
+	start|restart)
+		if [ ! -r "%%WWWDIR%%/app/src/StartupSafety.js" ]; then
+			echo 'kaigi: this service script requires the startup-safety application update'
+			exit 1
+		fi
+		case "${kaigi_start_timeout}" in ''|*[!0-9]*) echo 'kaigi: invalid start timeout'; exit 1 ;; esac
+		if [ "${kaigi_start_timeout}" -lt 1 ] || [ "${kaigi_start_timeout}" -gt 300 ]; then
+			echo 'kaigi: start timeout must be 1..300 seconds'
+			exit 1
+		fi
+		case "${kaigi_action}" in
+			one*|force*) ;;
+			*) if ! checkyesno kaigi_enable; then echo 'kaigi: service is disabled'; exit 1; fi ;;
+		esac
+		kaigi_selected_csv=$(printf '%s\n' "${kaigi_selected}" | tr ' ' ',')
+		set -- "%%PREFIX%%/etc/kaigi" /var/db/kaigi /var/run/kaigi "${kaigi_selected_csv}" "${kaigi_operation}"
+		for kaigi_instance in ${kaigi_instances}; do
+			kaigi_user="${kaigi_daemon_user}"
+			kaigi_group="${kaigi_daemon_group}"
+			if [ "${kaigi_instance}" != default ]; then
+				eval "kaigi_user=\${kaigi_${kaigi_instance}_daemon_user:-\$kaigi_user}"
+				eval "kaigi_group=\${kaigi_${kaigi_instance}_daemon_group:-\$kaigi_group}"
+			fi
+			set -- "$@" "${kaigi_instance}" "${kaigi_user}" "${kaigi_group}"
+		done
+		"%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" preflight "$@" || exit 1
+		;;
+esac
 
 kaigi_result=0
 for kaigi_instance in ${kaigi_selected}; do
 	echo "==> Kaigi instance: ${kaigi_instance}"
 	if ! kaigi_run_instance "${kaigi_instance}"; then
 		kaigi_result=1
+		case "${kaigi_operation}" in start|restart) break ;; esac
 	fi
 done
 exit "${kaigi_result}"
