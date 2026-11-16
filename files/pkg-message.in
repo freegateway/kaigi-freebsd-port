@@ -9,18 +9,21 @@ Enable and start the independent Kaigi service:
     sysrc kaigi_instances="staff"
     service kaigi start
 
-First copy %%PREFIX%%/etc/kaigi/instances/example to a new named directory
-such as %%PREFIX%%/etc/kaigi/instances/staff. Follow its README to rename
-the required .sample files and configure accounts, TLS and network allocations.
+First copy %%PREFIX%%/etc/kaigi/example to a new named directory
+such as %%PREFIX%%/etc/kaigi/staff. Follow its README to rename
+the required .sample files and configure accounts and network allocations.
+Configure TLS for direct HTTPS, or an explicit trusted HTTPS proxy backend.
 There is no default instance. No example directory is automatically enabled.
-Every instance's configuration belongs under etc/kaigi/instances/NAME.
+Every instance's configuration belongs under etc/kaigi/NAME.
 Protect credentials and TLS keys.
 LDAP support is included, disabled by default; configure ldap/ldap.conf and
 ldap/group-meetings.json before setting LDAP_ENABLED=true.
 MiroTalk may coexist using its own service and settings.
 Choose distinct listener addresses or ports when running both services.
 Named Kaigi instances are selected with kaigi_instances in rc.conf. Each needs
-its own configuration directory, web port/public URL and disjoint media ports.
+its own configuration directory, web socket/public URL and disjoint media ports.
+Proxy mode supports hostname routing, not URL prefixes, over private TCP or
+Unix sockets. See %%DOCSDIR%%/INSTANCES.md for forwarding and permissions.
 See the NAMED INSTANCES section of kaigi(8) before enabling this mode.
 
 See kaigi(8), kaigi.conf(5), kaigi-ldap.conf(5), and

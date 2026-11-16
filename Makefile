@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.6.5
+DISTVERSION=	0.8.0
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -17,7 +17,7 @@ RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	56e48749b0cbcda4bdfce1d7af812d52ee8ee78c
+GH_TAGNAME=	1de576c443a717a64d6d13dce2c73b05de305593
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
@@ -85,26 +85,26 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/rc.d
 	${INSTALL_SCRIPT} ${WRKDIR}/kaigi \
 		${STAGEDIR}${PREFIX}/etc/rc.d/kaigi
-	${MKDIR} ${STAGEDIR}${ETCDIR}/instances/example/site-assets \
-		${STAGEDIR}${ETCDIR}/instances/example/ldap
+	${MKDIR} ${STAGEDIR}${ETCDIR}/example/site-assets \
+		${STAGEDIR}${ETCDIR}/example/ldap
 	${INSTALL_DATA} ${WRKDIR}/instance-README \
-		${STAGEDIR}${ETCDIR}/instances/example/README
+		${STAGEDIR}${ETCDIR}/example/README
 	${INSTALL_DATA} ${WRKDIR}/kaigi.conf.sample \
-		${STAGEDIR}${ETCDIR}/instances/example/kaigi.conf.sample
+		${STAGEDIR}${ETCDIR}/example/kaigi.conf.sample
 	${INSTALL_DATA} ${WRKDIR}/kaigi-ldap.conf.sample \
-		${STAGEDIR}${ETCDIR}/instances/example/ldap/ldap.conf.sample
+		${STAGEDIR}${ETCDIR}/example/ldap/ldap.conf.sample
 .for sample in site-translations.json meeting-properties.json
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/${sample}.sample \
-		${STAGEDIR}${ETCDIR}/instances/example/${sample}.sample
+		${STAGEDIR}${ETCDIR}/example/${sample}.sample
 .endfor
 .for sample in site.css privacy-private.html privacy-public.html
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/${sample}.sample \
-		${STAGEDIR}${ETCDIR}/instances/example/site-assets/${sample}.sample
+		${STAGEDIR}${ETCDIR}/example/site-assets/${sample}.sample
 .endfor
 	${INSTALL_DATA} -m 0600 ${WRKSRC}/packaging/freebsd/users.sample \
-		${STAGEDIR}${ETCDIR}/instances/example/users.sample
+		${STAGEDIR}${ETCDIR}/example/users.sample
 	${INSTALL_DATA} ${WRKSRC}/packaging/freebsd/group-meetings.json.sample \
-		${STAGEDIR}${ETCDIR}/instances/example/ldap/group-meetings.json.sample
+		${STAGEDIR}${ETCDIR}/example/ldap/group-meetings.json.sample
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/man/man8 \
 		${STAGEDIR}${PREFIX}/share/man/man5
 	${INSTALL_MAN} ${WRKDIR}/kaigi.8 \

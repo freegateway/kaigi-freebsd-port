@@ -19,23 +19,23 @@ build and test `www/kaigi` using your usual Poudriere configuration. The port
 requires `www/mediasoup` version 3.32.2 or newer and Node.js 24.
 
 The service is `kaigi`; every instance's settings live under
-`/usr/local/etc/kaigi/instances/NAME/`.
+`/usr/local/etc/kaigi/NAME/`.
 Configure users, meeting permissions, TLS and media addresses before starting
 it. See the installed `kaigi(8)`, `kaigi.conf(5)` and `kaigi-ldap.conf(5)` manuals.
 
 ## Named instances
 
-The uniform named-instance layout requires Kaigi 0.6.0 or newer.
+The flat named-instance layout requires Kaigi 0.7.0 or newer.
 The service refuses starts on older application code.
 
 Set `kaigi_instances="staff public"` in rc.conf, and provision separate
-`/usr/local/etc/kaigi/instances/staff` and `public` configuration trees.
+`/usr/local/etc/kaigi/staff` and `public` configuration trees.
 For one instance use `kaigi_instances="staff"`. A missing or empty list rejects
 start/restart; there is no default instance. Package templates and a provisioning
-README live in `instances/example/`; copy to a new named directory, rename and
+README live in `example/`; copy to a new named directory, rename and
 configure the required .sample files. Templates are never enabled automatically.
 Use `service kaigi restart staff`; omitting the name acts on the whole list.
-Each instance needs its own web port/public URL and non-overlapping TCP/UDP media
+Each instance needs its own web socket/public URL and non-overlapping TCP/UDP media
 ranges. Separate service accounts are optional but recommended for isolation.
 Preflight checks the entire configured list before any restart stop phase, under
 a service-wide lock. Live allocation snapshots cover settings changed since an
@@ -46,9 +46,18 @@ Run `node --test tests/test-rc.cjs` to check dispatch and preflight behavior.
 The native rc.subr/daemon lifecycle and log-reopening test runs only as root on
 FreeBSD, in temporary directories with loopback-only fixture servers.
 
+Kaigi 0.8.0 supports direct HTTPS or hostname-based HTTPS reverse proxies with
+private TCP or Unix-socket backends. See the installed INSTANCES.md and
+kaigi.conf(5) for trusted forwarding, socket ownership and HAProxy examples.
+Each Unix socket needs a safe parent visible to both processes; the rc-managed
+runtime directory is recommended. For a separate proxy account, deliberately
+configure the service primary group, proxy membership and socket mode 0660.
+Existing socket paths fail startup rather than being deleted automatically.
+WebRTC media still uses separate TCP/UDP allocations.
+
 These are repository maintenance tests, not package files or build requirements.
-Git archives exclude `tests/` through `.gitattributes`; retain that exclusion when
-preparing deployment archives or the port for submission to FreeBSD.
+Deployment source archives include `tests/` so the deployment script can run
+them before omitting them from the final FreeBSD port directory.
 
 ## Source and dependencies
 

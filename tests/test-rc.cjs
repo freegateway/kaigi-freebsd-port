@@ -8,6 +8,12 @@ const path = require('node:path');
 const { spawnSync, spawn } = require('node:child_process');
 const template = fs.readFileSync(path.join(__dirname, '../files/kaigi.in'), 'utf8');
 
+test('keeps maintenance tests exportable and omits the instance banner', () => {
+    const attributes = path.join(__dirname, '../.gitattributes');
+    if (fs.existsSync(attributes)) assert.doesNotMatch(fs.readFileSync(attributes, 'utf8'), /tests.*export-ignore/);
+    assert(!template.includes('==> Kaigi instance:'));
+});
+
 function platformLock(content, platform = process.platform) {
     return platform === 'linux' ? content.replace('/usr/bin/lockf -k -t 30', '/usr/bin/flock -w 30') : content;
 }
@@ -44,14 +50,14 @@ test('configuration packaging contains inactive example templates only', () => {
     assert.ok(entries.length >= 10);
     for (const entry of entries) {
         assert.ok(!entry.startsWith('@sample'), entry);
-        if (entry === '@dir etc/kaigi/instances') continue;
-        assert.match(entry, /etc\/kaigi\/instances\/example\//);
+        if (entry === '@dir etc/kaigi') continue;
+        assert.match(entry, /etc\/kaigi\/example\//);
         assert.ok(entry.endsWith('.sample') || entry.endsWith('/README'), entry);
     }
     assert.match(makefile, /_KAIGI_APP_TEMPLATES=[\s\S]*?instance-README/);
     assert.match(makefile, /\$\{WRKDIR\}\/instance-README/);
     for (const line of makefile.split('\n').filter((line) => line.includes('${STAGEDIR}${ETCDIR}/'))) {
-        assert.ok(line.includes('${ETCDIR}/instances/example'), line);
+        assert.ok(line.includes('${ETCDIR}/example'), line);
     }
 });
 
@@ -70,7 +76,7 @@ function fixture(native = false) {
             fs.appendFileSync(path.join(root, 'events'), 'preflight-begin\\n');
             if (fs.existsSync(path.join(root, 'delay'))) require('node:child_process').spawnSync('/bin/sleep', ['0.2']);
             for (let i = 6; i < args.length; i += 3) {
-                const config = path.join(args[1], 'instances', args[i]);
+                const config = path.join(args[1], args[i]);
                 for (const name of ['users','kaigi.conf']) if (!fs.existsSync(path.join(config,name))) process.exit(1);
             }
             if (fs.existsSync(path.join(root, 'preflight-fail'))) process.exit(1);
@@ -105,7 +111,7 @@ function fixture(native = false) {
         process.on('SIGTERM', () => server.close(() => process.exit(0)));
     `);
     for (const instance of ['default', 'staff', 'public']) {
-        const directory = path.join(config, 'instances', instance);
+        const directory = path.join(config, instance);
         fs.mkdirSync(directory, { recursive: true });
         fs.writeFileSync(path.join(directory, 'kaigi.conf'), '# fixture\n');
         fs.writeFileSync(path.join(directory, 'users'), `${instance}|fixture|Example|["example"]\n`);
@@ -163,19 +169,19 @@ test('uniform named paths, dispatch, independent credentials and stable secrets'
         assert.equal(f.run('kaigi_enable="YES"\nkaigi_instances="staff"\n', ['start']).status, 0);
         let records = fs.readFileSync(f.capture, 'utf8').trim().split('\n');
         assert.match(records[0], /start\|kaigi_staff\|/);
-        assert(records[0].includes(`${f.root}/run/staff/kaigi.pid|${f.config}/instances/staff|${f.root}/state/staff|www|www|staff|`));
+        assert(records[0].includes(`${f.root}/run/staff/kaigi.pid|${f.config}/staff|${f.root}/state/staff|www|www|staff|`));
         const settings = 'kaigi_enable="YES"\nkaigi_instances="staff public"\nkaigi_staff_daemon_user="staffuser"\nkaigi_staff_daemon_group="staffgroup"\n';
         assert.equal(f.run(settings, ['start']).status, 0);
         records = fs.readFileSync(f.capture, 'utf8').trim().split('\n');
         assert(records[1].includes('|staffuser|staffgroup|staff|'));
         assert(records[2].includes('|www|www|public|'));
-        const secret = name => fs.readFileSync(path.join(f.config, 'instances', name, 'jwt-secret'), 'utf8');
+        const secret = name => fs.readFileSync(path.join(f.config, name, 'jwt-secret'), 'utf8');
         const staffSecret = secret('staff');
         assert.match(staffSecret, /^[a-f0-9]{64}\n$/);
         assert.notEqual(staffSecret, secret('public'));
         assert.equal(f.run(settings, ['start', 'staff']).status, 0);
         assert.equal(secret('staff'), staffSecret);
-        assert.equal(fs.statSync(path.join(f.config, 'instances/staff/jwt-secret')).mode & 0o777, 0o600);
+        assert.equal(fs.statSync(path.join(f.config, 'staff/jwt-secret')).mode & 0o777, 0o600);
         for (const action of ['stop', 'restart', 'status', 'onestart', 'rcvar']) {
             assert.equal(f.run(settings, [action, 'staff']).status, 0);
             assert(fs.readFileSync(f.capture, 'utf8').trim().split('\n').at(-1).startsWith(`${action === 'restart' ? 'start' : action}|kaigi_staff|`));
@@ -216,7 +222,7 @@ test('missing configuration fails the entire preflight; status needs no credenti
     const f = fixture();
     try {
         const settings = 'kaigi_enable="YES"\nkaigi_instances="staff public"\n';
-        fs.unlinkSync(path.join(f.config, 'instances/staff/users'));
+        fs.unlinkSync(path.join(f.config, 'staff/users'));
         assert.equal(f.run(settings, ['start']).status, 1);
         assert(!fs.existsSync(f.capture));
         assert.equal(f.run(settings, ['status', 'staff']).status, 0);
@@ -232,10 +238,10 @@ test('does not overwrite a symlinked secret or start named instances on an old a
         const settings = 'kaigi_enable="YES"\nkaigi_instances="staff"\n';
         const sentinel = path.join(f.root, 'sentinel');
         fs.writeFileSync(sentinel, 'unchanged');
-        fs.symlinkSync(sentinel, path.join(f.config, 'instances/staff/jwt-secret'));
+        fs.symlinkSync(sentinel, path.join(f.config, 'staff/jwt-secret'));
         assert.equal(f.run(settings, ['start']).status, 1);
         assert.equal(fs.readFileSync(sentinel, 'utf8'), 'unchanged');
-        fs.unlinkSync(path.join(f.config, 'instances/staff/jwt-secret'));
+        fs.unlinkSync(path.join(f.config, 'staff/jwt-secret'));
         fs.unlinkSync(path.join(f.application, 'app/src/StartupSafety.js'));
         assert.equal(f.run(settings, ['start']).status, 1);
     } finally { f.cleanup(); }
@@ -244,7 +250,7 @@ test('does not overwrite a symlinked secret or start named instances on an old a
 test('requires at least one explicit instance and never starts example directories implicitly', () => {
     const f = fixture();
     try {
-        fs.mkdirSync(path.join(f.config, 'instances/example'), { recursive: true });
+        fs.mkdirSync(path.join(f.config, 'example'), { recursive: true });
         for (const setting of ['', 'kaigi_instances=""\n', 'kaigi_instances="   "\n']) {
             for (const action of ['start', 'restart', 'onestart', 'forcerestart', 'quietstart']) {
                 const result = f.run('kaigi_enable="YES"\n' + setting, [action]);
@@ -256,7 +262,7 @@ test('requires at least one explicit instance and never starts example directori
         assert.equal(f.run('kaigi_enable="YES"\nkaigi_instances="default"\n', ['start']).status, 0);
         const line = fs.readFileSync(f.capture, 'utf8');
         assert.match(line, /start\|kaigi_default\|/);
-        assert(line.includes(`${f.config}/instances/default`));
+        assert(line.includes(`${f.config}/default`));
         assert(line.includes(`${f.root}/run/default/kaigi.pid`));
     } finally { f.cleanup(); }
 });
