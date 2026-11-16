@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit bc2ac13c0840056477b007a0d62f6d6988d00340.
+# Locked production dependencies from Kaigi commit 1de576c443a717a64d6d13dce2c73b05de305593.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -113,7 +113,7 @@ DISTFILES+=	depd-2.0.0.tgz:npm060
 MASTER_SITES+=	https://registry.npmjs.org/destroy/-/:npm061
 DISTFILES+=	destroy-1.2.0.tgz:npm061
 MASTER_SITES+=	https://registry.npmjs.org/dompurify/-/:npm063
-DISTFILES+=	dompurify-3.4.17.tgz:npm063
+DISTFILES+=	dompurify-3.4.18.tgz:npm063
 MASTER_SITES+=	https://registry.npmjs.org/dotenv/-/:npm064
 DISTFILES+=	dotenv-18.0.8.tgz:npm064
 MASTER_SITES+=	https://registry.npmjs.org/dunder-proto/-/:npm065
@@ -303,7 +303,7 @@ DISTFILES+=	jose-6.2.3.tgz:npm153
 MASTER_SITES+=	https://registry.npmjs.org/js-yaml/-/:npm154
 DISTFILES+=	js-yaml-5.5.0.tgz:npm154
 MASTER_SITES+=	https://registry.npmjs.org/jsdom/-/:npm297
-DISTFILES+=	jsdom-31.0.0.tgz:npm297
+DISTFILES+=	jsdom-31.0.1.tgz:npm297
 MASTER_SITES+=	https://registry.npmjs.org/jsonwebtoken/-/:npm156
 DISTFILES+=	jsonwebtoken-9.0.3.tgz:npm156
 MASTER_SITES+=	https://registry.npmjs.org/jwa/-/:npm157
@@ -638,7 +638,7 @@ _NPM_MODULES=	node_modules/@exodus/bytes bytes-1.16.0.tgz \
 		node_modules/delayed-stream delayed-stream-1.0.0.tgz \
 		node_modules/depd depd-2.0.0.tgz \
 		node_modules/destroy destroy-1.2.0.tgz \
-		node_modules/dompurify dompurify-3.4.17.tgz \
+		node_modules/dompurify dompurify-3.4.18.tgz \
 		node_modules/dotenv dotenv-18.0.8.tgz \
 		node_modules/dunder-proto dunder-proto-1.0.1.tgz \
 		node_modules/ecdsa-sig-formatter ecdsa-sig-formatter-1.0.11.tgz \
@@ -736,7 +736,7 @@ _NPM_MODULES=	node_modules/@exodus/bytes bytes-1.16.0.tgz \
 		node_modules/joi joi-17.13.9.tgz \
 		node_modules/jose jose-6.2.3.tgz \
 		node_modules/js-yaml js-yaml-5.5.0.tgz \
-		node_modules/jsdom jsdom-31.0.0.tgz \
+		node_modules/jsdom jsdom-31.0.1.tgz \
 		node_modules/jsonwebtoken jsonwebtoken-9.0.3.tgz \
 		node_modules/jsonwebtoken/node_modules/semver semver-7.7.1.tgz \
 		node_modules/jwa jwa-2.0.1.tgz \

@@ -221,7 +221,7 @@ kaigi_run_instance()
 	kaigi_run_user="${kaigi_daemon_user}"
 	kaigi_run_group="${kaigi_daemon_group}"
 	name="kaigi_${KAIGI_INSTANCE}"
-	KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi/instances/${KAIGI_INSTANCE}"
+	KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi/${KAIGI_INSTANCE}"
 	KAIGI_STATE_DIR="/var/db/kaigi/${KAIGI_INSTANCE}"
 	kaigi_run_dir="/var/run/kaigi/${KAIGI_INSTANCE}"
 	kaigi_log_dir="/var/log/kaigi/${KAIGI_INSTANCE}"
@@ -313,7 +313,6 @@ esac
 
 kaigi_result=0
 for kaigi_instance in ${kaigi_selected}; do
-	echo "==> Kaigi instance: ${kaigi_instance}"
 	if ! kaigi_run_instance "${kaigi_instance}"; then
 		kaigi_result=1
 		case "${kaigi_operation}" in start|restart) break ;; esac
