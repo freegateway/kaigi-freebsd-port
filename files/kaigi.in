@@ -124,6 +124,7 @@ kaigi_precmd()
 	kaigi_directory /var/run/kaigi 0755 root wheel || return 1
 	kaigi_directory /var/log/kaigi 0755 root wheel || return 1
 	kaigi_directory "${kaigi_run_dir}" 0755 root wheel || return 1
+	kaigi_session_reset || return 1
 	kaigi_directory "${kaigi_log_dir}" 0755 root wheel || return 1
 	"%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" save-plan /var/run/kaigi/preflight.json "${KAIGI_INSTANCE}" "${kaigi_run_dir}/launch-plan.json" || return 1
 	kaigi_directory /var/db/kaigi 0755 root wheel || return 1
@@ -156,7 +157,9 @@ kaigi_precmd()
 	fi
 	HOST_USERS="$(cat "${KAIGI_CONFIG_DIR}/users")" || return 1
 	export JWT_SECRET HOST_USERS
-	kaigi_ready_dir=$(mktemp -d "${kaigi_run_dir}/startup.XXXXXX") || return 1
+	kaigi_ready_dir=$(mktemp -d "${kaigi_session_dir}/startup.XXXXXX") || return 1
+	trap 'kaigi_ready_cleanup' 0
+	trap 'exit 1' HUP INT TERM
 	chown "${kaigi_run_user}:${kaigi_run_group}" "${kaigi_ready_dir}" || return 1
 	KAIGI_READY_FILE="${kaigi_ready_dir}/ready.json"
 	KAIGI_STARTUP_NONCE=$(/usr/bin/openssl rand -hex 16) || return 1
@@ -180,6 +183,60 @@ kaigi_precmd()
 	cd "%%WWWDIR%%" || return 1
 }
 
+kaigi_stopped()
+{
+	# Refuse cleanup even for an unexpected live process in either PID file.
+	for kaigi_check_file in "${pidfile}" "${kaigi_supervisor_pidfile}"; do
+		[ ! -L "${kaigi_check_file}" ] || return 1
+		[ -e "${kaigi_check_file}" ] || continue
+		kaigi_check_pid=$(cat "${kaigi_check_file}") || return 1
+		case "${kaigi_check_pid}" in ''|*[!0-9]*) return 1 ;; esac
+		[ "${kaigi_check_pid}" -gt 1 ] || return 1
+		if kill -0 "${kaigi_check_pid}" 2>/dev/null; then
+			echo "${name}: process ${kaigi_check_pid} remains alive; preserving session directory"
+			return 1
+		fi
+	done
+}
+
+kaigi_session_remove()
+{
+	kaigi_stopped || return 1
+	[ "${kaigi_session_dir}" = "/var/run/kaigi/${KAIGI_INSTANCE}/session" ] || return 1
+	if [ -L "${kaigi_session_dir}" ]; then
+		echo "${name}: session directory must not be a symlink"
+		return 1
+	fi
+	[ ! -e "${kaigi_session_dir}" ] || [ -d "${kaigi_session_dir}" ] || return 1
+	# The exact target is below the validated root-controlled instance directory.
+	rm -rf -- "${kaigi_session_dir}"
+}
+
+kaigi_session_reset()
+{
+	kaigi_session_remove || return 1
+	# Retire readiness directories from releases predating session/. Never
+	# follow a link or touch an administrator's custom socket outside session/.
+	for kaigi_old_ready in "${kaigi_run_dir}"/startup.??????; do
+		[ ! -L "${kaigi_old_ready}" ] || continue
+		[ -d "${kaigi_old_ready}" ] || continue
+		rm -rf -- "${kaigi_old_ready}" || return 1
+	done
+	kaigi_directory "${kaigi_session_dir}" 0750 "${kaigi_run_user}" "${kaigi_run_group}"
+}
+
+kaigi_ready_cleanup()
+{
+	[ -n "${kaigi_ready_dir:-}" ] || return 0
+	[ ! -L "${kaigi_session_dir}" ] && [ ! -L "${kaigi_ready_dir}" ] || return 1
+	rm -f "${kaigi_ready_dir}/ready.json" || return 1
+	if ! rmdir "${kaigi_ready_dir}"; then
+		echo "${name}: could not remove readiness directory: ${kaigi_ready_dir}"
+		return 1
+	fi
+	kaigi_ready_dir=""
+}
+
 kaigi_guarded_precmd()
 {
 	# rc.subr's force prefix can ignore a hook's failure. Exit this instance's
@@ -190,8 +247,7 @@ kaigi_guarded_precmd()
 kaigi_started()
 {
 	if "%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" wait "${KAIGI_READY_FILE}" "${pidfile}" "${KAIGI_STARTUP_NONCE}" "${kaigi_start_timeout}"; then
-		rm -f "${KAIGI_READY_FILE}"
-		rmdir "${kaigi_ready_dir}"
+		kaigi_ready_cleanup || return 1
 		return 0
 	fi
 	echo "${name}: startup did not become ready within ${kaigi_start_timeout} seconds"
@@ -210,8 +266,8 @@ kaigi_started()
 		[ -z "${kaigi_child}" ] || kill -KILL "${kaigi_child}"
 		kill -KILL "${kaigi_supervisor}"
 	fi
-	rm -f "${KAIGI_READY_FILE}"
-	rmdir "${kaigi_ready_dir}" 2>/dev/null || :
+	kaigi_ready_cleanup
+	kaigi_session_remove
 	return 1
 }
 
@@ -224,6 +280,7 @@ kaigi_run_instance()
 	KAIGI_CONFIG_DIR="%%PREFIX%%/etc/kaigi/${KAIGI_INSTANCE}"
 	KAIGI_STATE_DIR="/var/db/kaigi/${KAIGI_INSTANCE}"
 	kaigi_run_dir="/var/run/kaigi/${KAIGI_INSTANCE}"
+	kaigi_session_dir="${kaigi_run_dir}/session"
 	kaigi_log_dir="/var/log/kaigi/${KAIGI_INSTANCE}"
 	eval "kaigi_run_user=\${kaigi_${KAIGI_INSTANCE}_daemon_user:-\$kaigi_run_user}"
 	eval "kaigi_run_group=\${kaigi_${KAIGI_INSTANCE}_daemon_group:-\$kaigi_run_group}"
@@ -251,6 +308,7 @@ kaigi_run_instance()
 	export KAIGI_INSTANCE KAIGI_CONFIG_DIR KAIGI_SOURCE_URL
 	start_precmd="kaigi_guarded_precmd"
 	start_postcmd="kaigi_started"
+	stop_postcmd="kaigi_session_remove"
 	kaigi_start_failed=NO
 	if [ "${kaigi_operation}" = restart ]; then
 		# Keep readiness failure observable even for force/one restart. rc.subr
