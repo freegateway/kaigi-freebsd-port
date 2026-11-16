@@ -134,6 +134,7 @@ function fixture(native = false) {
             case "$operation" in start|restart) eval "$start_precmd" || return 1 ;; esac
             printf '%s|%s|%s|%s|%s|%s|%s|%s|%s\\n' "$1" "$name" "$pidfile" "$KAIGI_CONFIG_DIR" "$KAIGI_STATE_DIR" "$kaigi_run_user" "$kaigi_run_group" "$HOST_USERS" "$command_args" >> "${root}/capture"
             case "$operation" in start|restart) kaigi_started || { case "$1" in force*) return 0 ;; *) return 1 ;; esac; } ;; esac
+            case "$operation" in stop) eval "$stop_postcmd" || return 1 ;; esac
         }
     `);
     const script = path.join(root, 'kaigi');
@@ -161,6 +162,45 @@ function fixture(native = false) {
 
 test('POSIX shell syntax', () => {
     assert.equal(spawnSync('/bin/sh', ['-n', path.join(__dirname, '../files/kaigi.in')]).status, 0);
+});
+
+test('recreates only stopped session contents and rejects a symlinked session', () => {
+    const f = fixture();
+    const settings = 'kaigi_enable="YES"\nkaigi_instances="staff"\n';
+    try {
+        const session = path.join(f.root, 'run/staff/session');
+        const oldReady = path.join(f.root, 'run/staff/startup.abc123');
+        fs.mkdirSync(oldReady, { recursive: true });
+        fs.mkdirSync(path.join(session, 'startup.stale'), { recursive: true });
+        fs.writeFileSync(path.join(session, 'stale.socket'), 'fixture');
+        assert.equal(f.run(settings, ['start']).status, 0);
+        assert.deepEqual(fs.readdirSync(session), []);
+        assert(!fs.existsSync(oldReady));
+        fs.writeFileSync(path.join(session, 'stale.socket'), 'fixture');
+        assert.equal(f.run(settings, ['stop', 'staff']).status, 0);
+        assert(!fs.existsSync(session));
+        assert.equal(f.run(settings, ['start']).status, 0);
+        fs.writeFileSync(path.join(f.root, 'run/staff/daemon.pid'), String(process.pid));
+        fs.writeFileSync(path.join(session, 'preserve'), 'live');
+        assert.equal(f.run(settings, ['start']).status, 1);
+        assert(fs.existsSync(path.join(session, 'preserve')));
+        fs.unlinkSync(path.join(f.root, 'run/staff/daemon.pid'));
+        fs.rmSync(session, { recursive: true });
+        fs.symlinkSync(f.config, session);
+        assert.equal(f.run(settings, ['start']).status, 1);
+        assert(fs.existsSync(path.join(f.config, 'staff/users')));
+    } finally { f.cleanup(); }
+});
+
+test('early startup failure removes its private readiness directory', () => {
+    const f = fixture();
+    try {
+        fs.mkdirSync(path.join(f.root, 'log/staff'), { recursive: true });
+        fs.symlinkSync(path.join(f.root, 'outside.log'), path.join(f.root, 'log/staff/kaigi.log'));
+        const result = f.run('kaigi_enable="YES"\nkaigi_instances="staff"\n', ['start']);
+        assert.equal(result.status, 1);
+        assert.deepEqual(fs.readdirSync(path.join(f.root, 'run/staff/session')), []);
+    } finally { f.cleanup(); }
 });
 
 test('uniform named paths, dispatch, independent credentials and stable secrets', () => {
@@ -299,7 +339,8 @@ test('stop and status accept removed names and survive a malformed configured li
         assert.equal(f.run('kaigi_instances="../invalid"\n', ['status', 'staff']).status, 0);
         fs.mkdirSync(path.join(f.root, 'run/staff'), { recursive: true });
         fs.writeFileSync(path.join(f.root, 'run/staff/kaigi.pid'), String(process.pid));
-        assert.equal(f.run('kaigi_instances="../invalid"\n', ['stop']).status, 0);
+        // The fixture does not actually stop processes: preserve a live PID's session.
+        assert.equal(f.run('kaigi_instances="../invalid"\n', ['stop']).status, 1);
         assert.match(fs.readFileSync(f.capture, 'utf8'), /stop\|kaigi_staff\|/);
         fs.writeFileSync(path.join(f.root, 'stale-identity'), 'fixture');
         assert.equal(f.run('kaigi_instances="public"\n', ['stop', 'staff']).status, 1);
