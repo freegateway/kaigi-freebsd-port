@@ -84,6 +84,14 @@ for kaigi_instance in ${kaigi_instances}; do
 	kaigi_seen="${kaigi_seen}${kaigi_instance} "
 done
 
+# Size automatic worker pools against all configured instances, including when
+# starting or restarting only one selected instance.
+KAIGI_INSTANCE_COUNT=0
+for kaigi_instance in ${kaigi_instances}; do
+    KAIGI_INSTANCE_COUNT=$((KAIGI_INSTANCE_COUNT + 1))
+done
+export KAIGI_INSTANCE_COUNT
+
 kaigi_selected="${kaigi_instances}"
 if [ -n "${2:-}" ]; then
 	case "$2" in
