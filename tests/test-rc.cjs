@@ -73,6 +73,7 @@ function fixture(native = false) {
         const fs = require('node:fs'), path = require('node:path');
         const root = ${JSON.stringify(root)}, args = process.argv.slice(2);
         if (args[0] === 'preflight') {
+            fs.writeFileSync(path.join(root, 'instance-count'), process.env.KAIGI_INSTANCE_COUNT || 'missing');
             fs.appendFileSync(path.join(root, 'events'), 'preflight-begin\\n');
             if (fs.existsSync(path.join(root, 'delay'))) require('node:child_process').spawnSync('/bin/sleep', ['0.2']);
             for (let i = 6; i < args.length; i += 3) {
@@ -396,4 +397,14 @@ test('native rc.subr and daemon: stopping/restarting one instance preserves the 
         f.run(settings, ['stop']);
         f.cleanup();
     }
+});
+
+
+test('automatic worker sizing includes unselected configured instances', () => {
+    const f = fixture();
+    try {
+        const result = f.run('kaigi_enable="YES"\nkaigi_instances="staff public"\n', ['start', 'staff']);
+        assert.equal(result.status, 0, result.stderr);
+        assert.equal(fs.readFileSync(path.join(f.root, 'instance-count'), 'utf8'), '2');
+    } finally { f.cleanup(); }
 });
