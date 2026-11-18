@@ -18,8 +18,8 @@ load_rc_config "$name"
 
 : ${kaigi_enable:="NO"}
 : ${kaigi_instances:=""}
-: ${kaigi_daemon_user:="www"}
-: ${kaigi_daemon_group:="www"}
+: ${kaigi_daemon_user:="kaigi"}
+: ${kaigi_daemon_group:="kaigi"}
 : ${kaigi_start_timeout:="30"}
 : ${NODE_ENV:="production"}
 export NODE_ENV
@@ -123,6 +123,9 @@ kaigi_directory()
 
 kaigi_precmd()
 {
+	id "${kaigi_run_user}" >/dev/null 2>&1 || return 1
+	getent group "${kaigi_run_group}" >/dev/null 2>&1 || return 1
+	[ -r "%%WWWDIR%%/app/src/ServiceStartup.js" ] || return 1
 	# fast/force must not bypass instance identity or replace a live snapshot.
 	if [ -n "$(check_pidfile "${pidfile}" "%%LOCALBASE%%/bin/node")" ]; then
 		echo "${name}: already running; use restart"
@@ -311,8 +314,11 @@ kaigi_run_instance()
 		fi
 	fi
 	command="/usr/sbin/daemon"
-	command_args="-f -H -p ${pidfile} -P ${kaigi_supervisor_pidfile} -u ${kaigi_run_user} -o ${kaigi_log_dir}/kaigi.log %%LOCALBASE%%/bin/node app/src/Server.js"
+	command_args="-f -H -p ${pidfile} -P ${kaigi_supervisor_pidfile} -o ${kaigi_log_dir}/kaigi.log %%LOCALBASE%%/bin/node app/src/ServiceStartup.js"
 	KAIGI_SOURCE_URL="%%KAIGI_SOURCE_URL%%"
+	KAIGI_RUN_USER="${kaigi_run_user}"
+	KAIGI_RUN_GROUP="${kaigi_run_group}"
+	export KAIGI_RUN_USER KAIGI_RUN_GROUP
 	export KAIGI_INSTANCE KAIGI_CONFIG_DIR KAIGI_SOURCE_URL
 	start_precmd="kaigi_guarded_precmd"
 	start_postcmd="kaigi_started"
