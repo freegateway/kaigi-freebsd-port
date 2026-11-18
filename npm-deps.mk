@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit bfaa3c3f550928cfd46f32016f0eeaa9c817178c.
+# Locked production dependencies from Kaigi commit 28ceabd9a216daf9e392d3ce3e7177025882a796.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -561,7 +561,7 @@ DISTFILES+=	wrappy-1.0.2.tgz:npm285
 MASTER_SITES+=	https://registry.npmjs.org/@types/ws/-/:npm286
 DISTFILES+=	ws-8.18.1.tgz:npm286
 MASTER_SITES+=	https://registry.npmjs.org/ws/-/:npm287
-DISTFILES+=	ws-8.21.0.tgz:npm287
+DISTFILES+=	ws-8.23.0.tgz:npm287
 MASTER_SITES+=	https://registry.npmjs.org/xml-name-validator/-/:npm288
 DISTFILES+=	xml-name-validator-5.0.0.tgz:npm288
 MASTER_SITES+=	https://registry.npmjs.org/xmlchars/-/:npm289
@@ -850,7 +850,7 @@ _NPM_MODULES=	node_modules/@exodus/bytes bytes-1.16.0.tgz \
 		node_modules/which-collection which-collection-1.0.2.tgz \
 		node_modules/which-typed-array which-typed-array-1.1.19.tgz \
 		node_modules/wrappy wrappy-1.0.2.tgz \
-		node_modules/ws ws-8.21.0.tgz \
+		node_modules/ws ws-8.23.0.tgz \
 		node_modules/xml-name-validator xml-name-validator-5.0.0.tgz \
 		node_modules/xmlchars xmlchars-2.2.0.tgz \
 		node_modules/yallist yallist-5.0.0.tgz

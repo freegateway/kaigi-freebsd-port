@@ -1,5 +1,5 @@
 PORTNAME=	kaigi
-DISTVERSION=	0.8.1
+DISTVERSION=	0.8.4
 CATEGORIES=	www
 DIST_SUBDIR=	${PORTNAME}
 EXTRACT_ONLY=	${DISTNAME}${EXTRACT_SUFX}
@@ -17,17 +17,17 @@ RUN_DEPENDS=	mediasoup>=3.32.2:www/mediasoup \
 USES=		python:env shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	freegateway
-GH_TAGNAME=	9dc701d079425e4573e44b4b4ecb8bf077b1132b
+GH_TAGNAME=	28ceabd9a216daf9e392d3ce3e7177025882a796
 
 ETCDIR=		${PREFIX}/etc/kaigi
 WWWDIR=		${PREFIX}/www/kaigi
-
-PKGINSTALL=	${FILESDIR}/pkg-install
 
 NO_ARCH=	yes
 NO_BUILD=	yes
 SUB_FILES=	kaigi kaigi.newsyslog.conf pkg-message
 SUB_LIST=	KAIGI_SOURCE_URL=${_KAIGI_SOURCE_URL}
+
+PKGINSTALL=	${FILESDIR}/pkg-install
 
 _KAIGI_APP_TEMPLATES=		kaigi.8 kaigi.conf.5 kaigi-ldap.conf.5 \
 				kaigi.conf.sample kaigi-ldap.conf.sample \
