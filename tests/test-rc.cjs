@@ -101,7 +101,7 @@ function fixture(native = false) {
             }
         }
     `);
-    fs.writeFileSync(path.join(application, 'app/src/Server.js'), `
+    fs.writeFileSync(path.join(application, 'app/src/ServiceStartup.js'), `
         const http = require('node:http');
         const server = http.createServer((q, r) => r.end(process.env.KAIGI_INSTANCE));
         server.listen(0, '127.0.0.1', () => {
@@ -122,6 +122,8 @@ function fixture(native = false) {
         load_rc_config() { . "${root}/rc.conf"; }
         checkyesno() { [ "$kaigi_enable" = YES ]; }
         check_pidfile() { return 1; }
+        id() { return 0; }
+        getent() { return 0; }
         chown() { return 0; }
         install() {
             for argument do directory="$argument"; done
@@ -210,12 +212,12 @@ test('uniform named paths, dispatch, independent credentials and stable secrets'
         assert.equal(f.run('kaigi_enable="YES"\nkaigi_instances="staff"\n', ['start']).status, 0);
         let records = fs.readFileSync(f.capture, 'utf8').trim().split('\n');
         assert.match(records[0], /start\|kaigi_staff\|/);
-        assert(records[0].includes(`${f.root}/run/staff/kaigi.pid|${f.config}/staff|${f.root}/state/staff|www|www|staff|`));
+        assert(records[0].includes(`${f.root}/run/staff/kaigi.pid|${f.config}/staff|${f.root}/state/staff|kaigi|kaigi|staff|`));
         const settings = 'kaigi_enable="YES"\nkaigi_instances="staff public"\nkaigi_staff_daemon_user="staffuser"\nkaigi_staff_daemon_group="staffgroup"\n';
         assert.equal(f.run(settings, ['start']).status, 0);
         records = fs.readFileSync(f.capture, 'utf8').trim().split('\n');
         assert(records[1].includes('|staffuser|staffgroup|staff|'));
-        assert(records[2].includes('|www|www|public|'));
+        assert(records[2].includes('|kaigi|kaigi|public|'));
         const secret = name => fs.readFileSync(path.join(f.config, name, 'jwt-secret'), 'utf8');
         const staffSecret = secret('staff');
         assert.match(staffSecret, /^[a-f0-9]{64}\n$/);
@@ -407,4 +409,16 @@ test('automatic worker sizing includes unselected configured instances', () => {
         assert.equal(result.status, 0, result.stderr);
         assert.equal(fs.readFileSync(path.join(f.root, 'instance-count'), 'utf8'), '2');
     } finally { f.cleanup(); }
+});
+
+
+test('uses the privileged bootstrap and keeps secrets out of launch arguments', () => {
+    assert(template.includes('app/src/ServiceStartup.js'));
+    assert(!template.includes('-u ${kaigi_run_user}'));
+    assert(template.includes('export KAIGI_RUN_USER KAIGI_RUN_GROUP'));
+    const install = fs.readFileSync(path.join(__dirname, '../files/pkg-install'), 'utf8');
+    assert(install.includes('PRE-INSTALL|POST-INSTALL)'));
+    assert(install.includes('pw groupadd kaigi'));
+    assert(install.includes('pw useradd kaigi -g kaigi'));
+    assert(install.includes('id -gn kaigi'));
 });

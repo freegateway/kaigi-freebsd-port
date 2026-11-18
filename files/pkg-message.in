@@ -1,6 +1,10 @@
 [
 { type: install
   message: <<EOM
+The package creates and verifies kaigi:kaigi. Stop existing instances and
+migrate writable state ownership before switching from www. Keep credentials
+root-owned; LDAP bind secrets must be mode 0600.
+
 Kaigi has been installed under %%WWWDIR%%.
 See %%DOCSDIR%%/BASELINE.md for source provenance.
 

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Private-port account creation without reserving an unregistered numeric ID.
+case "$2" in
+PRE-INSTALL|POST-INSTALL)
+	if ! pw groupshow kaigi >/dev/null 2>&1; then
+		pw groupadd kaigi || exit 1
+	fi
+	if ! pw usershow kaigi >/dev/null 2>&1; then
+		pw useradd kaigi -g kaigi -d /nonexistent -s /usr/sbin/nologin -c 'Kaigi service' -w no || exit 1
+	fi
+	[ "$(id -u kaigi)" -gt 0 ] && [ "$(id -gn kaigi)" = kaigi ] || exit 1
+	[ "$(pw usershow kaigi | cut -d: -f10)" = /usr/sbin/nologin ] || exit 1
+	getent group kaigi >/dev/null || exit 1
+	;;
+esac
