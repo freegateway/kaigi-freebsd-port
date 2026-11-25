@@ -82,7 +82,9 @@ function fixture(native = false) {
             }
             if (fs.existsSync(path.join(root, 'preflight-fail'))) process.exit(1);
             fs.appendFileSync(path.join(root, 'events'), 'preflight-end\\n');
-        } else if (args[0] === 'save-plan') fs.writeFileSync(args[3], '{}');
+        } else if (args[0] === 'save-plan') fs.writeFileSync(args[3], JSON.stringify({
+            config: fs.realpathSync(path.join(root, 'etc/kaigi', args[2])), state: path.join(root, 'state', args[2]) }));
+        else if (args[0] === 'path') process.stdout.write(JSON.parse(fs.readFileSync(args[1]))[args[2]]);
         else if (args[0] === 'identity' && fs.existsSync(path.join(root, 'stale-identity'))) process.exit(1);
         else if (args[0] === 'ready' || args[0] === 'wait') {
             if (fs.existsSync(path.join(root, 'readiness-fail'))) process.exit(1);
@@ -165,6 +167,19 @@ function fixture(native = false) {
 
 test('POSIX shell syntax', () => {
     assert.equal(spawnSync('/bin/sh', ['-n', path.join(__dirname, '../files/kaigi.in')]).status, 0);
+});
+
+test('launches with the canonical paths supplied by the validated plan', () => {
+    const f = fixture();
+    try {
+        const real = path.join(f.root, 'etc/real-kaigi');
+        fs.renameSync(f.config, real); fs.symlinkSync(real, f.config);
+        const result = f.run('kaigi_enable="YES"\nkaigi_instances="staff"\n', ['start']);
+        assert.equal(result.status, 0, result.stderr);
+        const fields = fs.readFileSync(f.capture, 'utf8').trim().split('|');
+        assert.equal(fields[3], path.join(real, 'staff'));
+        assert.equal(fields[4], path.join(f.root, 'state/staff'));
+    } finally { f.cleanup(); }
 });
 
 test('recreates only stopped session contents and rejects a symlinked session', () => {
