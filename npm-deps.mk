@@ -1,4 +1,4 @@
-# Locked production dependencies from Kaigi commit 47ef9a8298ae68a4c9fcaf29b6d4e77d29b3725b.
+# Locked production dependencies from Kaigi commit c1c72c02c9a069806c0ecbdf130ba47fa335122b.
 # The www/mediasoup port supplies the Node API and native worker.
 # No npm lifecycle scripts are run. Duplicate versions retain lockfile paths.
 
@@ -113,7 +113,7 @@ DISTFILES+=	depd-2.0.0.tgz:npm060
 MASTER_SITES+=	https://registry.npmjs.org/destroy/-/:npm061
 DISTFILES+=	destroy-1.2.0.tgz:npm061
 MASTER_SITES+=	https://registry.npmjs.org/dompurify/-/:npm063
-DISTFILES+=	dompurify-3.4.18.tgz:npm063
+DISTFILES+=	dompurify-3.5.0.tgz:npm063
 MASTER_SITES+=	https://registry.npmjs.org/dotenv/-/:npm064
 DISTFILES+=	dotenv-18.0.8.tgz:npm064
 MASTER_SITES+=	https://registry.npmjs.org/dunder-proto/-/:npm065
@@ -638,7 +638,7 @@ _NPM_MODULES=	node_modules/@exodus/bytes bytes-1.16.0.tgz \
 		node_modules/delayed-stream delayed-stream-1.0.0.tgz \
 		node_modules/depd depd-2.0.0.tgz \
 		node_modules/destroy destroy-1.2.0.tgz \
-		node_modules/dompurify dompurify-3.4.18.tgz \
+		node_modules/dompurify dompurify-3.5.0.tgz \
 		node_modules/dotenv dotenv-18.0.8.tgz \
 		node_modules/dunder-proto dunder-proto-1.0.1.tgz \
 		node_modules/ecdsa-sig-formatter ecdsa-sig-formatter-1.0.11.tgz \
