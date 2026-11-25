@@ -138,6 +138,9 @@ kaigi_precmd()
 	kaigi_session_reset || return 1
 	kaigi_directory "${kaigi_log_dir}" 0755 root wheel || return 1
 	"%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" save-plan /var/run/kaigi/preflight.json "${KAIGI_INSTANCE}" "${kaigi_run_dir}/launch-plan.json" || return 1
+	KAIGI_CONFIG_DIR=$("%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" path "${kaigi_run_dir}/launch-plan.json" config) || return 1
+	KAIGI_STATE_DIR=$("%%LOCALBASE%%/bin/node" "%%WWWDIR%%/app/src/StartupSafety.js" path "${kaigi_run_dir}/launch-plan.json" state) || return 1
+	export KAIGI_CONFIG_DIR KAIGI_STATE_DIR
 	kaigi_directory /var/db/kaigi 0755 root wheel || return 1
 	kaigi_directory "${KAIGI_STATE_DIR}" 0700 "${kaigi_run_user}" "${kaigi_run_group}" || return 1
 
